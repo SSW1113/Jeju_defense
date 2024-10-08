@@ -4,15 +4,14 @@ import { CLIENT_VERSION } from './constants.js';
 
 /*---------------------------------------------
     [Session 생성자]
-    domain: http://localhost
-    port:3000
 
-    [주의사항] 
-        :(colon) 빼고 http://localhost까지만 쓰기
+    protocol: http
+    domain: localhost
+    port:3000
 ---------------------------------------------*/
 class Session {
-  constructor(domain, port) {
-    this.socket = io(`${domain}:${port}`, {
+  constructor(protocol, domain, port) {
+    this.socket = io(`${protocol}://${domain}:${port}`, {
       query: {
         clientVersion: CLIENT_VERSION,
       },
@@ -53,5 +52,5 @@ class Session {
   }
 }
 
-export const session = new Session("http://localhost", 3000);
+export const session = new Session("http", "localhost", 3000);
 
