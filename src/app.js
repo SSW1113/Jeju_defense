@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
-initSocket(server);
+initSocket(server, "http", "localhost", 8080);
 
 server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
