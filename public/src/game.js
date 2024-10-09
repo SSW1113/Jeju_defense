@@ -1,3 +1,4 @@
+import { Session } from "../Session.js";
 import { Base } from "./base.js";
 import { Monster } from "./monster.js";
 import { Tower } from "./tower.js";
@@ -5,8 +6,7 @@ import { Tower } from "./tower.js";
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
-
-let serverSocket; // 서버 웹소켓 객체
+//let serverSocket; // 서버 웹소켓 객체
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -239,6 +239,7 @@ function initGame() {
   isInitGame = true;
 }
 
+var session;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
@@ -250,12 +251,13 @@ Promise.all([
   ),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  let somewhere;
-  serverSocket = io("서버주소", {
-    auth: {
-      token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
-    },
-  });
+  session = new Session("http", "localhost", 3000);
+  // let somewhere;
+  // serverSocket = io("http://localhost:3000", {
+  //   auth: {
+  //     token: somewhere, // 토큰이 저장된 어딘가에서 가져와야 합니다!
+  //   },
+  // });
 
   /* 
     서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다! 
