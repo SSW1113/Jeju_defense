@@ -1,21 +1,19 @@
-import { Packet } from '/Packet.js';
-import { CLIENT_VERSION } from './constants.js';
+import { Packet } from './Packet.js';
+//import { CLIENT_VERSION } from './constants.js';
 
 
 /*---------------------------------------------
     [Session 생성자]
-    domain: http://localhost
-    port:3000
 
-    [주의사항] 
-        :(colon) 빼고 http://localhost까지만 쓰기
+    protocol: http
+    domain: localhost
+    port:3000
 ---------------------------------------------*/
-class Session {
-  constructor(domain, port) {
-    this.socket = io(`${domain}:${port}`, {
-      query: {
-        clientVersion: CLIENT_VERSION,
-      },
+export class Session {
+  constructor(protocol, domain, port) {
+    this.socket = io.connect(`${protocol}://${domain}:${port}`, {
+      cors: {origin: "*" }
+
     });
     
     this.userId = null;
@@ -50,8 +48,5 @@ class Session {
 -------------------------------------------------------------*/
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
-  }
+  } 
 }
-
-export const session = new Session("http://localhost", 3000);
-
