@@ -13,15 +13,61 @@ export class Monster {
     this.width = 80; // 몬스터 이미지 가로 길이
     this.height = 80; // 몬스터 이미지 세로 길이
     this.speed = 2; // 몬스터의 이동 속도
+    this.baseSpeed = speed; // 원래 속도
     this.image = monsterImages[this.monsterNumber]; // 몬스터 이미지
     this.level = level; // 몬스터 레벨
+    this.nearbyMonsters = [];
     this.init(level);
+
+    this.speedReduction = 1; // 슬로우 정도 (1이 기본 이동속도)
+    this.slowDuration = 0; // 슬로우 지속시간
   }
 
   init(level) {
     this.maxHp = 100 + 10 * level; // 몬스터의 현재 HP
     this.hp = this.maxHp; // 몬스터의 현재 HP
     this.attackPower = 10 + 1 * level; // 몬스터의 공격력 (기지에 가해지는 데미지)
+  }
+
+  // 슬로우 적용
+  applySlow(slowEffect, duration) {
+    this.speedReduction = slowEffect;
+    this.slowDuration = duration;
+  }
+
+  updateSpeed() {
+    if (this.slowDuration > 0) {
+      // 슬로우가 묻으면 속도 감소
+      this.slowDuration--;
+      this.speed = this.baseSpeed * this.speedReduction;
+    } else {
+      // 슬로우가 끝나면 원래 속도로 복구
+      this.speedReduction = 1;
+      this.speed = this.baseSpeed;
+    }
+  }
+
+  applySplashDamage(splashRange, attackPower) {
+    const nearbyMonsters = this.getNearbyMonsters(splashRange);
+    nearbyMonsters.forEach((monster) => {
+      monster.hp -= attackPower;
+    });
+  }
+
+  getNearbyMonsters(splashRange) {
+    const nearbyMonsters = [];
+    const x = this.x;
+    const y = this.y;
+
+    monsters.forEach((monster) => {
+      const distance = Math.sqrt(
+        Math.pow(monster.x - x, 2) + Math.pow(monster.y - y, 2)
+      );
+
+      if (distance <= splashRange && monster !== target) {
+        nearbyMonsters.push(monster);
+      }
+    });
   }
 
   move(base) {

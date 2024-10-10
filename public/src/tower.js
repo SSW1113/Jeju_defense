@@ -46,3 +46,65 @@ export class Tower {
     }
   }
 }
+
+// 광역 공격을 하는 타워 (강하르방)
+export class StrongTower extends Tower {
+  constructor(x, y, cost) {
+    super(x, y, cost);
+    this.attackPower = 100;
+    this.range = 400;
+    this.cooldown = 0;
+    this.splashRange = 200;
+  }
+
+  attack(monster) {
+    if (this.cooldown <= 0) {
+      monster.hp -= this.attackPower;
+      monster.applySplashDamage(this.splashRange, this.attackPower);
+      this.cooldown = 270;
+      this.beamDuration = 30;
+      this.target = monster;
+    }
+  }
+}
+
+// 슬로우 공격을 하는 타워 (쿨하르방)
+export class CoolTower extends Tower {
+  constructor(x, y, cost) {
+    super(x, y, cost);
+    this.attackPower = 60;
+    this.range = 300;
+    this.cooldown = 180;
+    this.slowEffect = 0.5;
+    this.slowDuration = 180;
+  }
+
+  attack(monster) {
+    if (this.cooldown <= 0) {
+      monster.hp -= this.attackPower;
+      monster.applySlow(this.slowEffect, this.slowDuration);
+      this.cooldown = 240;
+      this.beamDuration = 30;
+      this.target = monster;
+    }
+  }
+}
+
+// 공속이 빠른 타워 (핫하르방)
+export class HotTower extends Tower {
+  constructor(x, y, cost) {
+    super(x, y, cost);
+    this.attackpower = 90;
+    this.range = 300;
+    this.cooldown = 0;
+  }
+
+  attack(monster) {
+    if (this.cooldown <= 0) {
+      monster.hp -= this.attackPower;
+      this.cooldown = 90;
+      this.beamDuration = 30;
+      this.target = monster;
+    }
+  }
+}
