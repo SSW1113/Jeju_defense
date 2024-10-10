@@ -47,6 +47,6 @@ export class Session {
 -------------------------------------------------------------*/
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
-  }
+  } 
 }
 
