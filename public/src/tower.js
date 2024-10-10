@@ -1,5 +1,5 @@
 export class Tower {
-  constructor(x, y, cost) {
+  constructor(x, y, cost, towerImages) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
     this.x = x; // 타워 이미지 x 좌표
     this.y = y; // 타워 이미지 y 좌표
@@ -11,18 +11,17 @@ export class Tower {
     this.cooldown = 0; // 타워 공격 쿨타임
     this.beamDuration = 0; // 타워 광선 지속 시간
     this.target = null; // 타워 광선의 목표
+    this.towerNumber = 0;
+    this.image = towerImages[this.towerNumber];
   }
 
-  draw(ctx, towerImage) {
-    ctx.drawImage(towerImage, this.x, this.y, this.width, this.height);
+  draw(ctx) {
+    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
-      ctx.lineTo(
-        this.target.x + this.target.width / 2,
-        this.target.y + this.target.height / 2
-      );
-      ctx.strokeStyle = "skyblue";
+      ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
+      ctx.strokeStyle = 'skyblue';
       ctx.lineWidth = 10;
       ctx.stroke();
       ctx.closePath();
@@ -47,14 +46,40 @@ export class Tower {
   }
 }
 
-// 광역 공격을 하는 타워 (강하르방)
+// 슬로우 공격을 하는 타워 (쿨하르방)
+export class CoolTower extends Tower {
+  constructor(x, y, cost, towerImages) {
+    super(x, y, cost, towerImages);
+    this.attackPower = 40;
+    this.range = 300;
+    this.cooldown = 180;
+    this.slowEffect = 0.5; // 50% 슬로우
+    this.slowDuration = 180;
+    this.towerNumber = 1;
+    this.image = towerImages[this.towerNumber];
+  }
+
+  attack(monster) {
+    if (this.cooldown <= 0) {
+      monster.hp -= this.attackPower;
+      monster.applySlow(this.slowEffect, this.slowDuration);
+      this.cooldown = 180;
+      this.beamDuration = 30;
+      this.target = monster;
+    }
+  }
+}
+
+// 느린 광역 공격을 하는 타워 (강하르방)
 export class StrongTower extends Tower {
-  constructor(x, y, cost) {
-    super(x, y, cost);
+  constructor(x, y, cost, towerImages) {
+    super(x, y, cost, towerImages);
     this.attackPower = 100;
     this.range = 400;
     this.cooldown = 0;
     this.splashRange = 200;
+    this.towerNumber = 2;
+    this.image = towerImages[this.towerNumber];
   }
 
   attack(monster) {
@@ -68,35 +93,15 @@ export class StrongTower extends Tower {
   }
 }
 
-// 슬로우 공격을 하는 타워 (쿨하르방)
-export class CoolTower extends Tower {
-  constructor(x, y, cost) {
-    super(x, y, cost);
-    this.attackPower = 60;
-    this.range = 300;
-    this.cooldown = 180;
-    this.slowEffect = 0.5;
-    this.slowDuration = 180;
-  }
-
-  attack(monster) {
-    if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower;
-      monster.applySlow(this.slowEffect, this.slowDuration);
-      this.cooldown = 240;
-      this.beamDuration = 30;
-      this.target = monster;
-    }
-  }
-}
-
 // 공속이 빠른 타워 (핫하르방)
 export class HotTower extends Tower {
-  constructor(x, y, cost) {
-    super(x, y, cost);
-    this.attackpower = 90;
+  constructor(x, y, cost, towerImages) {
+    super(x, y, cost, towerImages);
+    this.attackPower = 60;
     this.range = 300;
     this.cooldown = 0;
+    this.towerNumber = 3;
+    this.image = towerImages[this.towerNumber];
   }
 
   attack(monster) {

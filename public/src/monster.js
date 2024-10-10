@@ -13,14 +13,15 @@ export class Monster {
     this.width = 80; // 몬스터 이미지 가로 길이
     this.height = 80; // 몬스터 이미지 세로 길이
     this.speed = 2; // 몬스터의 이동 속도
-    this.baseSpeed = this.speed; // 원래 속도
+    this.baseSpeed = this.speed; // 몬스터의 원래 속도
     this.image = monsterImages[this.monsterNumber]; // 몬스터 이미지
     this.level = level; // 몬스터 레벨
-    this.nearbyMonsters = [];
     this.init(level);
 
     this.speedReduction = 1; // 슬로우 정도 (1이 기본 이동속도)
     this.slowDuration = 0; // 슬로우 지속시간
+
+    this.nearbyMonsters = []; // 근처 몬스터들
   }
 
   init(level) {
@@ -30,9 +31,9 @@ export class Monster {
   }
 
   // 슬로우 적용
-  applySlow(slowEffect, duration) {
-    this.speedReduction = slowEffect;
-    this.slowDuration = duration;
+  applySlow(slowEffect, slowDuration) {
+    this.speedReduction = 1 - slowEffect;
+    this.slowDuration = slowDuration;
   }
 
   updateSpeed() {
@@ -73,6 +74,8 @@ export class Monster {
   }
 
   move(base) {
+    this.updateSpeed(); // 슬로우 확인
+
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
