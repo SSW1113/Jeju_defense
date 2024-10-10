@@ -3,6 +3,9 @@ export class Tower {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
     this.x = x; // 타워 이미지 x 좌표
     this.y = y; // 타워 이미지 y 좌표
+    this.upgrade = 0; // 타워 업그레이드 상태
+    this.upgradeCost = 500; // 기본 업그레이드 비용
+    this.upgradeCostInc = 250; // 업그레이트 비용 증가량
     this.width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
     this.height = 150; // 타워 이미지 세로 길이
     this.attackPower = 40; // 타워 공격력
@@ -13,6 +16,7 @@ export class Tower {
     this.target = null; // 타워 광선의 목표
     this.towerNumber = 0;
     this.image = towerImages[this.towerNumber];
+    this.beamColor = 'yellow';
   }
 
   draw(ctx) {
@@ -21,7 +25,7 @@ export class Tower {
       ctx.beginPath();
       ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
       ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
-      ctx.strokeStyle = 'skyblue';
+      ctx.strokeStyle = this.beamColor;
       ctx.lineWidth = 10;
       ctx.stroke();
       ctx.closePath();
@@ -32,11 +36,22 @@ export class Tower {
   attack(monster) {
     // 타워가 타워 사정거리 내에 있는 몬스터를 공격하는 메소드이며 사정거리에 닿는지 여부는 game.js에서 확인합니다.
     if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower;
+      monster.hp -= this.attackPower + this.upgrade * 10;
       this.cooldown = 180; // 3초 쿨타임 (초당 60프레임)
       this.beamDuration = 30; // 광선 지속 시간 (0.5초)
       this.target = monster; // 광선의 목표 설정
     }
+  }
+
+  upgradeTower() {
+    /* 
+      돈 충분한지 검증해야함
+      const currentUpgradeCost = this.upgradeCost + (this.upgradeCostInc * this.upgrade)
+      if (money >= curentUpgradeCost){
+
+      }
+    */
+    this.upgrade++;
   }
 
   updateCooldown() {
@@ -48,8 +63,10 @@ export class Tower {
 
 // 슬로우 공격을 하는 타워 (쿨하르방)
 export class CoolTower extends Tower {
-  constructor(x, y, cost, towerImages) {
-    super(x, y, cost, towerImages);
+  constructor(x, y, cost, towerImages, upgrade) {
+    super(x, y, cost, towerImages, upgrade);
+    this.upgradeCost = 750;
+    this.upgradeCostInc = 375;
     this.attackPower = 40;
     this.range = 300;
     this.cooldown = 180;
@@ -57,11 +74,12 @@ export class CoolTower extends Tower {
     this.slowDuration = 180;
     this.towerNumber = 1;
     this.image = towerImages[this.towerNumber];
+    this.beamColor = 'skyblue';
   }
 
   attack(monster) {
     if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower;
+      monster.hp -= this.attackPower + this.upgrade * 10;
       monster.applySlow(this.slowEffect, this.slowDuration);
       this.cooldown = 180;
       this.beamDuration = 30;
@@ -72,19 +90,22 @@ export class CoolTower extends Tower {
 
 // 느린 광역 공격을 하는 타워 (강하르방)
 export class StrongTower extends Tower {
-  constructor(x, y, cost, towerImages) {
-    super(x, y, cost, towerImages);
+  constructor(x, y, cost, towerImages, upgrade) {
+    super(x, y, cost, towerImages, upgrade);
+    this.upgradeCost = 750;
+    this.upgradeCostInc = 375;
     this.attackPower = 100;
     this.range = 400;
     this.cooldown = 0;
     this.splashRange = 200;
     this.towerNumber = 2;
     this.image = towerImages[this.towerNumber];
+    this.beamColor = 'black';
   }
 
   attack(monster) {
     if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower;
+      monster.hp -= this.attackPower + this.upgrade * 10;
       monster.applySplashDamage(this.splashRange, this.attackPower);
       this.cooldown = 270;
       this.beamDuration = 30;
@@ -95,18 +116,21 @@ export class StrongTower extends Tower {
 
 // 공속이 빠른 타워 (핫하르방)
 export class HotTower extends Tower {
-  constructor(x, y, cost, towerImages) {
-    super(x, y, cost, towerImages);
+  constructor(x, y, cost, towerImages, upgrade) {
+    super(x, y, cost, towerImages, upgrade);
+    this.upgradeCost = 1000;
+    this.upgradeCostInc = 500;
     this.attackPower = 60;
     this.range = 300;
     this.cooldown = 0;
     this.towerNumber = 3;
     this.image = towerImages[this.towerNumber];
+    this.beamColor = 'red';
   }
 
   attack(monster) {
     if (this.cooldown <= 0) {
-      monster.hp -= this.attackPower;
+      monster.hp -= this.attackPower + this.upgrade * 10;
       this.cooldown = 90;
       this.beamDuration = 30;
       this.target = monster;

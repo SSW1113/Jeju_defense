@@ -104,5 +104,14 @@ export class Monster {
     ctx.font = '12px Arial';
     ctx.fillStyle = 'white';
     ctx.fillText(`(레벨 ${this.level}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
+
+    if (this.slowDuration > 0) {
+      ctx.beginPath();
+      ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 40, 0, Math.PI * 2);
+      ctx.strokeStyle = 'lightblue';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.closePath();
+    }
   }
 }
