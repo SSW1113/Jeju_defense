@@ -4,6 +4,9 @@
   "main": "src/app.js",
   "license": "MIT",
   "type": "module",
+  "scripts": {
+    "dev": "nodemon src/app.js"
+  },
   "dependencies": {
     "@prisma/client": "^5.20.0",
     "cookie-parser": "^1.4.6",
