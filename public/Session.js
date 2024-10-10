@@ -13,6 +13,7 @@ export class Session {
   constructor(protocol, domain, port) {
     this.socket = io.connect(`${protocol}://${domain}:${port}`, {
       cors: {origin: "*" }
+
     });
     
     this.userId = null;
@@ -49,4 +50,3 @@ export class Session {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
   } 
 }
-
