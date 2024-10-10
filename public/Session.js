@@ -1,5 +1,7 @@
+import { CLIENT_VERSION } from './Constant.js';
 import { Packet } from './Packet.js';
-//import { CLIENT_VERSION } from './constants.js';
+import { loadGameAssets } from './Assets.js';
+import { initStage } from './src/game.js';
 
 
 /*---------------------------------------------
@@ -36,9 +38,11 @@ export class Session {
     });
 
     // 클라이언트가 서버와 연결될 때
-    this.socket.on('connection', (data) => {
+    this.socket.on('connection', async (data) => {
       console.log('connection: ', data);
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
+      await loadGameAssets(data.gameAssets); // 게임 에셋 로드
+      await initStage();
     });
   }
 
