@@ -1,5 +1,5 @@
-import { Packet } from '/Packet.js';
-import { CLIENT_VERSION } from './constants.js';
+import { Packet } from './Packet.js';
+//import { CLIENT_VERSION } from './constants.js';
 
 
 /*---------------------------------------------
@@ -9,12 +9,11 @@ import { CLIENT_VERSION } from './constants.js';
     domain: localhost
     port:3000
 ---------------------------------------------*/
-class Session {
+export class Session {
   constructor(protocol, domain, port) {
-    this.socket = io(`${protocol}://${domain}:${port}`, {
-      query: {
-        clientVersion: CLIENT_VERSION,
-      },
+    this.socket = io.connect(`${protocol}://${domain}:${port}`, {
+      cors: {origin: "*" }
+
     });
     
     this.userId = null;
@@ -49,8 +48,5 @@ class Session {
 -------------------------------------------------------------*/
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
-  }
+  } 
 }
-
-export const session = new Session("http", "localhost", 3000);
-
