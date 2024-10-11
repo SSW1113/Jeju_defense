@@ -1,3 +1,5 @@
+
+import { handlerEvent } from './handlers/helper.js';
 import { Packet } from './Packet.js';
 //import { CLIENT_VERSION } from './constants.js';
 
@@ -38,6 +40,13 @@ export class Session {
       console.log('connection: ', data);
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
     });
+
+    this.socket.on('event', (data)=>{
+      console.log('genPacket', data);
+
+      handlerEvent(this.socket, data);
+
+    })
   }
 
   /*-------------------------------------------------------------
