@@ -14,18 +14,16 @@ const ctx = canvas.getContext('2d');
 
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
-let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨 - 스테이지
-let monsterSpawnInterval = 1000; // 몬스터 생성 주기
+let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
-let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 
@@ -56,6 +54,20 @@ for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
 }
 
 let monsterPath;
+
+// 서버 관리 (점수, 골드)
+let userGold = 0; // 유저 골드
+let score = 0; // 게임 점수
+
+export const setUserGold = (gold) => {
+  userGold = gold;
+};
+export const setScore = (newScore) => {
+  score = newScore;
+};
+
+export const getUserGold = () => userGold;
+export const getScore = () => score;
 
 function generateRandomMonsterPath() {
   const path = [];
@@ -229,12 +241,8 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       monsters.splice(i, 1);
 
-      score += 100 * monsterLevel;
-      userGold += 10 * monsterLevel;
-
-      // 몬스터 처치 요청이 꼭 필요한가..?
-      // 서버로 몬스터 처치 요청 (payload: stageId, score)
-      // session.sendEvent(ePacketId.MonsterKill, { stageId: monsterLevel, score });
+      // 서버로 몬스터 처치 요청 (payload: currentStage)
+      session.sendEvent(ePacketId.MonsterKill, { currentStage });
     }
   }
 

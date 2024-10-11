@@ -1,6 +1,6 @@
 import { redis } from '../utils/redis/index.js';
 
-class StageManager {
+class ScoreManager {
   /**
    * 스테이지 할당
    * @param uuid
@@ -8,16 +8,13 @@ class StageManager {
    * @param score
    * @param timestamp
    */
-  async setStage(uuid, id, score, timestamp) {
+  async addScore(uuid, scorePerStage) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON
-        ? JSON.parse(userDataJSON)
-        : { currentScore: 0, currentGold: 0, stages: [] };
+      const userData = userDataJSON ? JSON.parse(userDataJSON) : { currentScore: 0, currentGold: 0, stages: [] };
 
-      // 스테이지 추가
-      userData.stages.push({ id, score, timestamp });
-      console.log(`${uuid}는 다음 스테이지로 이동합니다!`);
+      // 점수 증가
+      userData.currentScore += scorePerStage;
 
       // 데이터 저장
       await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
@@ -30,18 +27,23 @@ class StageManager {
    * 스테이지 불러오기
    * @param uuid
    */
-  async getStage(uuid) {
+  async getScore(uuid) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON
-        ? JSON.parse(userDataJSON)
-        : { currentScore: 0, currentGold: 0, stages: [] };
+      const userData = userDataJSON ? JSON.parse(userDataJSON) : null;
 
-      return userData.stages;
+      if (userData) {
+        // currentScore 반환
+        return userData.currentScore;
+      } else {
+        console.log(`사용자 ${uuid}의 데이터가 없습니다.`);
+        return 0;
+      }
     } catch (err) {
       console.log('Redis: 처리 오류:', err);
+      return 0;
     }
   }
 }
 
-export const stageManager = new StageManager();
+export const scoreManager = new ScoreManager();

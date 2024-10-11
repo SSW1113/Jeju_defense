@@ -2,6 +2,7 @@ import { CLIENT_VERSION } from './Constant.js';
 import { Packet } from './Packet.js';
 import { loadGameAssets } from './Assets.js';
 import { initStage } from './src/game.js';
+import { setScore, setUserGold } from './src/game.js';
 
 
 /*---------------------------------------------
@@ -35,6 +36,13 @@ export class Session {
     // 이벤트 결과
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
+
+      if(data.currentGold !== undefined) {
+        setUserGold(data.currentGold);
+      }
+      if(data.currentScore !== undefined) {
+        setScore(data.currentScore);
+      }
     });
 
     // 클라이언트가 서버와 연결될 때

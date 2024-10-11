@@ -1,5 +1,6 @@
 import { stageManager } from "../models/stage.model.js";
 import { getGameAssets } from "../init/assets.js";
+import { goldManager } from "../models/gold.model.js";
 
 /**
  * 스테이지 이동 핸들러
@@ -58,9 +59,14 @@ export const moveStageHandler = async (userId, payload) => {
     serverTime,
   );
 
+  // 스테이지 클리어 보상
+  const goldToAdd = payload.currentStage.reward;
+  await goldManager.earnGold(userId, goldToAdd);
+  const currentGold = await goldManager.getGold(userId);
+
   const stageData = await stageManager.getStage(userId);
   // 로그 체크
   console.log('Stage: ', stageData);
 
-  return { status: 'success', currentStage: stageData.id };
+  return { status: 'success', currentStage: stageData.id, currentGold: currentGold };
 };
