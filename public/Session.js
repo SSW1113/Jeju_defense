@@ -1,7 +1,6 @@
 import { Packet } from './Packet.js';
 //import { CLIENT_VERSION } from './constants.js';
 
-
 /*---------------------------------------------
     [Session 생성자]
 
@@ -12,15 +11,14 @@ import { Packet } from './Packet.js';
 export class Session {
   constructor(protocol, domain, port) {
     this.socket = io.connect(`${protocol}://${domain}:${port}`, {
-      cors: {origin: "*" }
-
+      cors: { origin: '*' },
     });
-    
+
     this.userId = null;
     this.Init();
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
     [소켓 이벤트 설정]
     1. response: 
         helper::handleEvent()에서 이벤트 처리 결과(status)를 보내는 이벤트
@@ -42,11 +40,11 @@ export class Session {
     });
   }
 
-/*-------------------------------------------------------------
+  /*-------------------------------------------------------------
     [패킷 전송]
     Packet(패킷ID, 유저ID, 클라이언트 버전, 내용)
 -------------------------------------------------------------*/
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
-  } 
+  }
 }
