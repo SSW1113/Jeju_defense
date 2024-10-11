@@ -22,7 +22,7 @@ let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
-// const monsters = [];
+
 const towers = [];
 
 let score = 0; // 게임 점수
@@ -47,41 +47,6 @@ const pathImage = new Image();
 pathImage.src = 'images/path.png';
 
 let monsterPath;
-// const monsterImages = [];
-// for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
-//   const img = new Image();
-//   img.src = `images/monster${i}.png`;
-//   monsterImages.push(img);
-// }
-
-// function generateRandomMonsterPath(canvas) {
-//   const path = [];
-//   let currentX = 0;
-//   let currentY = Math.floor(Math.random() * 21) + 500; // 500 ~ 520 범위의 y 시작 (캔버스 y축 중간쯤에서 시작할 수 있도록 유도)
-
-//   path.push({ x: currentX, y: currentY });
-
-//   while (currentX < canvas.width) {
-//     currentX += Math.floor(Math.random() * 100) + 50; // 50 ~ 150 범위의 x 증가
-//     // x 좌표에 대한 clamp 처리
-//     if (currentX > canvas.width) {
-//       currentX = canvas.width;
-//     }
-
-//     currentY += Math.floor(Math.random() * 200) - 100; // -100 ~ 100 범위의 y 변경
-//     // y 좌표에 대한 clamp 처리
-//     if (currentY < 0) {
-//       currentY = 0;
-//     }
-//     if (currentY > canvas.height) {
-//       currentY = canvas.height;
-//     }
-
-//     path.push({ x: currentX, y: currentY });
-//   }
-
-//   return path;
-// }
 
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
@@ -207,11 +172,6 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
-// function spawnMonster() {
-//   // monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
-//   monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
-// }
-
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
@@ -227,11 +187,13 @@ function gameLoop() {
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
+  //console.log(monsterManager.getMonsters());
+
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
     tower.draw(ctx, towerImages);
     tower.updateCooldown();
-    monsterManager.monsters.forEach((monster) => {
+    monsterManager.getMonsters().forEach((monster) => {
       const distance = Math.sqrt(
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
       );
