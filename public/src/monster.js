@@ -5,7 +5,7 @@ export class Monster {
   constructor(path, monsterImages, level, hp, attackPower, speed,  goldDrop) {
     // 생성자 안에서 몬스터의 속성을 정의한다고 생각하시면 됩니다!
     if (!path || path.length <= 0) {
-      throw new Error("몬스터가 이동할 경로가 필요합니다.");
+      throw new Error('몬스터가 이동할 경로가 필요합니다.');
     }
     
     /*---------------------------------------------
@@ -18,8 +18,14 @@ export class Monster {
     this.attackPower = attackPower; // 몬스터의 공격력 (기지에 가해지는 데미지)
     this.level = level; // 몬스터 레벨
     this.speed = speed // 몬스터의 이동 속도
-    this.goldDrop = goldDrop
+    this.goldDrop = goldDrop; //드랍골드
+    this.baseSpeed = this.speed; // 몬스터의 원래 속도
 
+    this.speedReduction = 1; // 슬로우 정도 (1이 기본 이동속도)
+    this.slowDuration = 0; // 슬로우 지속시간
+
+    this.nearbyMonsters = []; // 근처 몬스터들
+    
     //위치
     this.path = path; // 몬스터가 이동할 경로
     this.currentIndex = 0; // 몬스터가 이동 중인 경로의 인덱스
@@ -42,7 +48,52 @@ export class Monster {
     this.attackPower +=  level; // 몬스터의 공격력 (기지에 가해지는 데미지)
   }
 
+  // 슬로우 적용
+  applySlow(slowEffect, slowDuration) {
+    this.speedReduction = 1 - slowEffect;
+    this.slowDuration = slowDuration;
+  }
+
+  updateSpeed() {
+    if (this.slowDuration > 0) {
+      // 슬로우가 묻으면 속도 감소
+      this.slowDuration--;
+      this.speed = this.baseSpeed * this.speedReduction;
+    } else {
+      // 슬로우가 끝나면 원래 속도로 복구
+      this.speedReduction = 1;
+      this.speed = this.baseSpeed;
+    }
+  }
+
+  // 자신 주변의 몬스터들에게도 데미지를 줌
+  applySplashDamage(splashRange, attackPower) {
+    const nearbyMonsters = this.getNearbyMonsters(splashRange);
+    nearbyMonsters.forEach((monster) => {
+      monster.hp -= attackPower;
+    });
+  }
+
+  // 자신 splashRange 내의 몬스터들의 배열을 반환
+  getNearbyMonsters(splashRange) {
+    const nearbyMonsters = [];
+    const x = this.x;
+    const y = this.y;
+
+    monsters.forEach((monster) => {
+      const distance = Math.sqrt(Math.pow(monster.x - x, 2) + Math.pow(monster.y - y, 2));
+
+      if (distance <= splashRange && monster !== target) {
+        nearbyMonsters.push(monster);
+      }
+    });
+
+    return nearbyMonsters;
+  }
+
   move(base) {
+    this.updateSpeed(); // 슬로우 확인
+
     if (this.currentIndex < this.path.length - 1) {
       const nextPoint = this.path[this.currentIndex + 1];
       const deltaX = nextPoint.x - this.x;
@@ -68,12 +119,17 @@ export class Monster {
 
   draw(ctx) {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
-    ctx.font = "12px Arial";
-    ctx.fillStyle = "white";
-    ctx.fillText(
-      `(레벨 ${this.level}) ${this.hp}/${this.maxHp}`,
-      this.x,
-      this.y - 5
-    );
+    ctx.font = '12px Arial';
+    ctx.fillStyle = 'white';
+    ctx.fillText(`(레벨 ${this.level}) ${this.hp}/${this.maxHp}`, this.x, this.y - 5);
+
+    if (this.slowDuration > 0) {
+      ctx.beginPath();
+      ctx.arc(this.x + this.width / 2, this.y + this.height / 2, 40, 0, Math.PI * 2);
+      ctx.strokeStyle = 'lightblue';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.closePath();
+    }
   }
 }
