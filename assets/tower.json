@@ -3,7 +3,7 @@
   "varsion": "1.0.0",
   "data": [
     {
-      "id": 1000,
+      "id": 100,
       "upgrade": 0,
       "upgradeCost": 500,
       "upgradeCostInc": 250,
@@ -19,7 +19,7 @@
       "beamColor": "yellow"
     },
     {
-      "id": 1001,
+      "id": 101,
       "upgrade": 0,
       "upgradeCost": 500,
       "upgradeCostInc": 250,
