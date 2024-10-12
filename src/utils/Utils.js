@@ -5,10 +5,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url); //현재 모듈의 절대 경로
 const __dirname = path.dirname(__filename);
 //최상위 경로 + assets 폴더
-const basePath= path.join(__dirname, "../Assets");
-
+const basePath= path.join(__dirname, "../../assets");
+console.log(basePath);
 export class Utils{
-    static basePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "../Assets");
+    static basePath = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../assets");
 
     //비동기 병렬로 파일을 읽기
     static async readFileAsync(filename){

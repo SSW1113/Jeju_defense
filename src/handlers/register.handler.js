@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { handleConnection, handleDisconnect, handlerEvent } from './helper.js';
 import { sessionManager } from '../models/session.model.js';
 import { monsterManager } from '../models/monsterSpawner.model.js';
+import { serverAssetManager } from '../init/assets.js';
 
 /*---------------------------------------------
     [ProcessConnect]
@@ -17,6 +18,11 @@ const registerHandler = (io) => {
 
     //클라에게 정상적으로 연결됐다고 알림
     handleConnection(socket, userUUID);
+
+      //초기화(Game Assets정보 보내주기)
+      const gameAssets = serverAssetManager.getGameAssets();
+      socket.emit('S2CInit', gameAssets);
+
 
     //사용자 정의 이벤트 등록
     socket.on('event', (data) => handlerEvent(io, socket, data));

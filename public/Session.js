@@ -2,6 +2,7 @@ import { ePacketId, Packet } from './Packet.js';
 import { CLIENT_VERSION } from './constants.js';
 import { handlerEvent } from './handlers/helper.js';
 import { getRandomPositionNearPath } from './src/game.js';
+import { assetManager } from './src/init/AssetManager.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -42,6 +43,11 @@ export class Session {
 
       this.sendEvent(ePacketId.StartGame);
       this.sendEvent(ePacketId.InitTower, getRandomPositionNearPath(200));
+    });
+
+    //game asset받아오기
+    this.socket.on('S2CInit',  (gameAssets) => {
+      assetManager.setGameAssetsAndInit(gameAssets);
     });
 
     this.socket.on('event', (data) => {
