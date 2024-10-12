@@ -1,9 +1,7 @@
 import { Session } from '../Session.js';
-import { monsterImages } from '../utils/monsterImages.js';
 import { utils } from '../utils/utils.js';
 import { Base } from './base.js';
 import { monsterManager } from './monsterManager.js';
-import { Monster } from './monster.js';
 import { CoolTower, HotTower, StrongTower, Tower } from './tower.js';
 /*
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
@@ -214,7 +212,7 @@ Promise.all([
   ...towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
-  ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...monsterManager.monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   console.log('try connect');
