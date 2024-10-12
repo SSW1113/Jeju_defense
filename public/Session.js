@@ -40,6 +40,7 @@ export class Session {
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
 
       this.sendEvent(ePacketId.StartGame, this.userId);
+      this.sendEvent(ePacketId.InitTower, this.userId);
     });
 
     this.socket.on('event', (data) => {

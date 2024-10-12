@@ -11,6 +11,7 @@ export const ePacketId = {
   RecoverGameState: 2,
   S2CGenMonster: 3,
   StartGame: 4,
+  InitTower: 5,
 };
 
 export class Packet {
