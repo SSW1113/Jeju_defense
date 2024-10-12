@@ -10,6 +10,7 @@ export const ePacketId = {
   SyncGameState: 1,
   RecoverGameState: 2,
   S2CGenMonster: 3,
+  StartGame: 4,
 };
 
 export class Packet {

@@ -1,5 +1,6 @@
-import { Packet } from './Packet.js';
-//import { CLIENT_VERSION } from './constants.js';
+import { ePacketId, Packet } from './Packet.js';
+import { CLIENT_VERSION } from './constants.js';
+import { handlerEvent } from './handlers/helper.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -37,14 +38,15 @@ export class Session {
     this.socket.on('connection', (data) => {
       console.log('connection: ', data);
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
+
+      this.sendEvent(ePacketId.StartGame, this.userId);
     });
 
-    this.socket.on('event', (data)=>{
+    this.socket.on('event', (data) => {
       console.log('genPacket', data);
 
       handlerEvent(this.socket, data);
-
-    })
+    });
   }
 
   /*-------------------------------------------------------------
