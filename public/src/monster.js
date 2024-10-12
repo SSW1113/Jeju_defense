@@ -2,7 +2,7 @@ export class Monster {
     /*---------------------------------------------
         [생성자]
     ---------------------------------------------*/
-  constructor(path, monsterImages, level, hp, attackPower, speed,  goldDrop) {
+  constructor(path, monsterImages, monsterId, level, maxHp, hp, attackPower, speed,  goldDrop) {
     // 생성자 안에서 몬스터의 속성을 정의한다고 생각하시면 됩니다!
     if (!path || path.length <= 0) {
       throw new Error('몬스터가 이동할 경로가 필요합니다.');
@@ -12,8 +12,8 @@ export class Monster {
         [멤버 변수]
     ---------------------------------------------*/
     //능력치
-    this.monsterId = Math.floor(Math.random() * monsterImages.length); // 몬스터 번호 (1 ~ 5. 몬스터를 추가해도 숫자가 자동으로 매겨집니다!)
-    this.maxHp = hp; // 몬스터의 최대 HP
+    this.monsterId = monsterId; // 몬스터 번호 (1 ~ 5. 몬스터를 추가해도 숫자가 자동으로 매겨집니다!)
+    this.maxHp = maxHp; // 몬스터의 최대 HP
     this.hp = hp; // 몬스터의 현재 HP
     this.attackPower = attackPower; // 몬스터의 공격력 (기지에 가해지는 데미지)
     this.level = level; // 몬스터 레벨
