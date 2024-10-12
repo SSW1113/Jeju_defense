@@ -1,20 +1,20 @@
-import { Session } from '../Session.js';
-import { Base } from './base.js';
+import { Session } from "../Session.js";
+import { monsterImages } from "../utils/monsterImages.js";
+import { utils } from "../utils/utils.js";
+import { Base } from "./base.js"; 
+import { monsterManager } from "./monsterManager.js";
 import { Monster } from './monster.js';
-import { Tower } from './tower.js';
+import { CoolTower, HotTower, StrongTower, Tower } from './tower.js';
 
 /* 
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
-
-//let serverSocket; // 서버 웹소켓 객체
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-
-const NUM_OF_MONSTERS = 5; // 몬스터 개수
+const canvas = document.getElementById("gameCanvas");
+utils.init(canvas);
+const ctx = canvas.getContext("2d");
+const NUM_OF_TOWERS = 4;
 
 // let userGold = 0; // 유저 골드
-window.userGold = 0; // 서버에서 받은 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
@@ -22,7 +22,7 @@ let towerCost = 1000; // 타워 구입 비용
 let numOfInitialTowers = 2; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
-const monsters = [];
+
 const towers = [];
 
 let score = 0; // 게임 점수
@@ -32,9 +32,12 @@ let isInitGame = false;
 // 이미지 로딩 파트
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
-
-const towerImage = new Image();
-towerImage.src = 'images/tower.png';
+const towerImages = [];
+for (let i = 1; i <= NUM_OF_TOWERS; i++) {
+  const img = new Image();
+  img.src = `images/tower${i}.png`;
+  towerImages.push(img);
+}
 
 const baseImage = new Image();
 baseImage.src = 'images/base.png';
@@ -42,43 +45,7 @@ baseImage.src = 'images/base.png';
 const pathImage = new Image();
 pathImage.src = 'images/path.png';
 
-const monsterImages = [];
-for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
-  const img = new Image();
-  img.src = `images/monster${i}.png`;
-  monsterImages.push(img);
-}
-
 let monsterPath;
-
-function generateRandomMonsterPath() {
-  const path = [];
-  let currentX = 0;
-  let currentY = Math.floor(Math.random() * 21) + 500; // 500 ~ 520 범위의 y 시작 (캔버스 y축 중간쯤에서 시작할 수 있도록 유도)
-
-  path.push({ x: currentX, y: currentY });
-
-  while (currentX < canvas.width) {
-    currentX += Math.floor(Math.random() * 100) + 50; // 50 ~ 150 범위의 x 증가
-    // x 좌표에 대한 clamp 처리
-    if (currentX > canvas.width) {
-      currentX = canvas.width;
-    }
-
-    currentY += Math.floor(Math.random() * 200) - 100; // -100 ~ 100 범위의 y 변경
-    // y 좌표에 대한 clamp 처리
-    if (currentY < 0) {
-      currentY = 0;
-    }
-    if (currentY > canvas.height) {
-      currentY = canvas.height;
-    }
-
-    path.push({ x: currentX, y: currentY });
-  }
-
-  return path;
-}
 
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
@@ -144,10 +111,9 @@ function getRandomPositionNearPath(maxDistance) {
 function placeInitialTowers() {
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, towerCost);
+    const tower = new Tower(x, y, towerCost, towerImages);
     towers.push(tower);
-    tower.draw(ctx, towerImage);
-    session.socket.emit('buildInitialTowers');
+    tower.draw(ctx);
   }
 }
 
@@ -162,16 +128,54 @@ function placeNewTower() {
   } else {
     console.log('골드가 부족합니다. 타워를 설치할 수 없습니다.');
   }
+  
+  /* 
+    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
+    빠진 코드들을 채워넣어주세요! 
+  */
+  const { x, y } = getRandomPositionNearPath(200);
+  const tower = new Tower(x, y, towerCost, towerImages);
+  towers.push(tower);
+  tower.draw(ctx);
+}
+
+function placeNewCoolTower() {
+  /* 
+    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
+    빠진 코드들을 채워넣어주세요! 
+  */
+  const { x, y } = getRandomPositionNearPath(200);
+  const tower = new CoolTower(x, y, towerCost, towerImages);
+  towers.push(tower);
+  tower.draw(ctx);
+}
+
+function placeNewStrongTower() {
+  /* 
+    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
+    빠진 코드들을 채워넣어주세요! 
+  */
+  const { x, y } = getRandomPositionNearPath(200);
+  const tower = new StrongTower(x, y, towerCost, towerImages);
+  towers.push(tower);
+  tower.draw(ctx);
+}
+
+function placeNewHotTower() {
+  /* 
+    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
+    빠진 코드들을 채워넣어주세요! 
+  */
+  const { x, y } = getRandomPositionNearPath(200);
+  const tower = new HotTower(x, y, towerCost, towerImages);
+  towers.push(tower);
+  tower.draw(ctx);
 }
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
   base.draw(ctx, baseImage);
-}
-
-function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
 }
 
 function gameLoop() {
@@ -185,15 +189,17 @@ function gameLoop() {
   ctx.fillStyle = 'white';
   ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
   ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${window.userGold}`, 100, 150); // 골드 표시
+  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
+  //console.log(monsterManager.getMonsters());
+
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
-    tower.draw(ctx, towerImage);
+    tower.draw(ctx, towerImages);
     tower.updateCooldown();
-    monsters.forEach((monster) => {
+    monsterManager.getMonsters().forEach((monster) => {
       const distance = Math.sqrt(
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
       );
@@ -206,8 +212,8 @@ function gameLoop() {
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
   base.draw(ctx, baseImage);
 
-  for (let i = monsters.length - 1; i >= 0; i--) {
-    const monster = monsters[i];
+  for (let i = monsterManager.monsters.length - 1; i >= 0; i--) {
+    const monster = monsterManager.monsters[i];
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
       if (isDestroyed) {
@@ -218,7 +224,7 @@ function gameLoop() {
       monster.draw(ctx);
     } else {
       /* 몬스터가 죽었을 때 */
-      monsters.splice(i, 1);
+      monsterManager.monsters.splice(i, 1);
     }
   }
 
@@ -230,12 +236,12 @@ function initGame() {
     return;
   }
 
-  monsterPath = generateRandomMonsterPath(); // 몬스터 경로 생성
+  monsterPath = utils.getPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
-  setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 
@@ -246,13 +252,15 @@ var session;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
-  new Promise((resolve) => (towerImage.onload = resolve)),
+  // new Promise((resolve) => (towerImage.onload = resolve)),
+  ...towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
-  session = new Session('http', 'localhost', 3000);
+  console.log("try connect");
+  session = new Session("http", "localhost", 3000);
   // let somewhere;
   // serverSocket = io("http://localhost:3000", {
   //   auth: {
@@ -268,15 +276,23 @@ Promise.all([
   }
 });
 
-const buyTowerButton = document.createElement('button');
-buyTowerButton.textContent = '타워 구입';
-buyTowerButton.style.position = 'absolute';
-buyTowerButton.style.top = '10px';
-buyTowerButton.style.right = '10px';
-buyTowerButton.style.padding = '10px 20px';
-buyTowerButton.style.fontSize = '16px';
-buyTowerButton.style.cursor = 'pointer';
+// 버튼 만드는 함수
+function createTowerButton(buttonName, onClickCallBack, positionTop, positionRight) {
+  const button = document.createElement('button');
+  button.textContent = buttonName;
+  button.style.position = 'absolute';
+  button.style.top = positionTop;
+  button.style.right = positionRight;
+  button.style.padding = '10px 20px';
+  button.style.fontSize = '16px';
+  button.style.cursor = 'pointer';
 
-buyTowerButton.addEventListener('click', placeNewTower);
+  button.addEventListener('click', onClickCallBack);
 
-document.body.appendChild(buyTowerButton);
+  document.body.appendChild(button);
+}
+
+createTowerButton('하르방\n$1000', placeNewTower, '10px', '10px');
+createTowerButton('쿨하르방\n$1500', placeNewCoolTower, '60px', '10px');
+// createTowerButton('강하르방\n$1500', placeNewStrongTower, '110px', '10px'); // 광역공격 미구현
+createTowerButton('핫하르방\n$2000', placeNewHotTower, '160px', '10px');

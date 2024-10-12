@@ -1,5 +1,5 @@
 import { redis } from "../utils/redis/index.js";
-
+import { monsterManager } from "./monsterSpawner.model.js";
 
 class UserManager{
     constructor(){
@@ -19,14 +19,17 @@ class UserManager{
         }
     };
     
-    // getUser(){
-    //     return this.users;
-    // }
-    
     async removeUser(uuid){
         try {
             await redis.del(`user:${uuid}:data`);
             console.log(`Redis: ${uuid}의 데이터 삭제`);
+
+            if(monsterManager.removeSpawner(uuid)){
+                console.log(`Monster Spawner: ${uuid}의 데이터 삭제`);
+            }
+            else{
+                console.log('Monster Spawner: 데이터 삭제 오류:');
+            }
 
             return true;
         } catch (error) {

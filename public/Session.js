@@ -39,21 +39,12 @@ export class Session {
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
     });
 
-    // 서버에서 골드 업데이트 이벤트 수신
-    this.socket.on('initGame', (data) => {
-      console.log('initGame 이벤트 수신:', data);
-      window.userGold = data.userGold; // 서버에서 받은 골드 값을 전역 변수로 업데이트
-      console.log('초기 골드:', window.userGold);
+    this.socket.on('event', (data)=>{
+      console.log('genPacket', data);
 
-      // 기본 타워 건설 요청
-      this.socket.emit('buildInitialTowers');
-    });
+      handlerEvent(this.socket, data);
 
-    // 서버에서 초기 타워 위치 수신
-    this.socket.on('initialTowers', (towers) => {
-      console.log('initialTowers 이벤트 수신:', towers);
-      placeInitialTowers(towers); // 타워 설치 함수 호출
-    });
+    })
   }
 
   /*-------------------------------------------------------------

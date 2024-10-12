@@ -2,14 +2,14 @@
     [PacketID]
       1. SyncGameState: 게임상태 동기화
 
-    [주의사항] 
+    [주의사항]  
         - 대문자로 시작하기
         - issue번호에 따라 만들기
 ---------------------------------------------*/
 export const ePacketId = {
   SyncGameState: 1,
   RecoverGameState: 2,
-  
+  S2CGenMonster: 3,
 };
 
 export class Packet {
