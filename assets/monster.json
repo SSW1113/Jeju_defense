@@ -1,5 +1,5 @@
 {
-  "name": "tower",
+  "name": "monster",
   "varsion": "1.0.0",
   "data": [
     {
@@ -7,7 +7,6 @@
       "maxHp": 100,
       "hp": 100,
       "attackPower": 10,
-      "level": "level",
       "speed": 1,
       "goldDrop": 30
     },
@@ -16,7 +15,6 @@
       "maxHp": 200,
       "hp": 200,
       "attackPower": 10,
-      "level": "level",
       "speed": 1,
       "goldDrop": 50
     },
@@ -25,7 +23,6 @@
       "maxHp": 300,
       "hp": 300,
       "attackPower": 10,
-      "level": "level",
       "speed": 1,
       "goldDrop": 100
     },
@@ -34,7 +31,6 @@
       "maxHp": 350,
       "hp": 350,
       "attackPower": 10,
-      "level": "level",
       "speed": 2,
       "goldDrop": 150
     },
@@ -43,7 +39,6 @@
       "maxHp": 300,
       "hp": 300,
       "attackPower": 10,
-      "level": "level",
       "speed": 3,
       "goldDrop": 250
     }
