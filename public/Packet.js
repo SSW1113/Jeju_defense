@@ -8,6 +8,8 @@
 ---------------------------------------------*/
 export const ePacketId = {
   SyncGameState: 1,
+  RecoverGameState: 2,
+  
 };
 
 export class Packet {
