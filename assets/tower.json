@@ -1,0 +1,38 @@
+{
+  "name": "tower",
+  "varsion": "1.0.0",
+  "data": [
+    {
+      "id": 1000,
+      "upgrade": 0,
+      "upgradeCost": 500,
+      "upgradeCostInc": 250,
+      "width": 78,
+      "height": 150,
+      "attackPower": 40,
+      "range": 300,
+      "cost": "cost",
+      "cooldown": 0,
+      "beamDuration": 0,
+      "towerNumber": 0,
+      "image": "towerImages[this.towerNumber]",
+      "beamColor": "yellow"
+    },
+    {
+      "id": 1001,
+      "upgrade": 0,
+      "upgradeCost": 500,
+      "upgradeCostInc": 250,
+      "width": 78,
+      "height": 150,
+      "attackPower": 40,
+      "range": 300,
+      "cost": "cost",
+      "cooldown": 0,
+      "beamDuration": 0,
+      "towerNumber": 0,
+      "image": "towerImages[this.towerNumber]",
+      "beamColor": "yellow"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import { ePacketId, Packet } from './Packet.js';
 import { CLIENT_VERSION } from './constants.js';
 import { handlerEvent } from './handlers/helper.js';
+import { getRandomPositionNearPath } from './src/game.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -39,8 +40,8 @@ export class Session {
       console.log('connection: ', data);
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
 
-      this.sendEvent(ePacketId.StartGame, this.userId);
-      this.sendEvent(ePacketId.InitTower, this.userId);
+      this.sendEvent(ePacketId.StartGame);
+      this.sendEvent(ePacketId.InitTower, getRandomPositionNearPath(200));
     });
 
     this.socket.on('event', (data) => {

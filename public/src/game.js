@@ -72,7 +72,7 @@ function drawRotatedImage(image, x, y, width, height, angle) {
   ctx.drawImage(image, -width / 2, -height / 2, width, height);
   ctx.restore();
 }
-function getRandomPositionNearPath(maxDistance) {
+export function getRandomPositionNearPath(maxDistance) {
   // 타워 배치를 위한 몬스터가 지나가는 경로 상에서 maxDistance 범위 내에서 랜덤한 위치를 반환하는 함수!
   const segmentIndex = Math.floor(Math.random() * (monsterPath.length - 1));
   const startX = monsterPath[segmentIndex].x;

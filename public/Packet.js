@@ -12,6 +12,7 @@ export const ePacketId = {
   S2CGenMonster: 3,
   StartGame: 4,
   InitTower: 5,
+  S2CBuildTower: 6,
 };
 
 export class Packet {
