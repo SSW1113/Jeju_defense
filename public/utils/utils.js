@@ -1,3 +1,8 @@
+/*---------------------------------------------
+    [몬스터 능력치 반환]
+        -목적: 몬스터 생성을 위해 monsterId에 맞는 능력치 반환
+        -반환 정보: Array(maxHp, hp, attackPower, speed, goldDrop)
+---------------------------------------------*/
 class Utils{
   constructor(){
     this.canvas = null;
