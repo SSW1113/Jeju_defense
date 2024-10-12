@@ -14,12 +14,12 @@ utils.init(canvas);
 const ctx = canvas.getContext("2d");
 const NUM_OF_TOWERS = 4;
 
-let userGold = 0; // 유저 골드
+// let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
-let towerCost = 0; // 타워 구입 비용
-let numOfInitialTowers = 0; // 초기 타워 개수
+let towerCost = 1000; // 타워 구입 비용
+let numOfInitialTowers = 2; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
 
@@ -32,7 +32,6 @@ let isInitGame = false;
 // 이미지 로딩 파트
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
-
 const towerImages = [];
 for (let i = 1; i <= NUM_OF_TOWERS; i++) {
   const img = new Image();
@@ -110,10 +109,6 @@ function getRandomPositionNearPath(maxDistance) {
 }
 
 function placeInitialTowers() {
-  /* 
-    타워를 초기에 배치하는 함수입니다.
-    무언가 빠진 코드가 있는 것 같지 않나요? 
-  */
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
     const tower = new Tower(x, y, towerCost, towerImages);
@@ -123,6 +118,17 @@ function placeInitialTowers() {
 }
 
 function placeNewTower() {
+  if (window.userGold >= towerCost) {
+    const { x, y } = getRandomPositionNearPath(200);
+    const tower = new Tower(x, y);
+    towers.push(tower);
+    tower.draw(ctx, towerImage);
+    window.userGold -= towerCost; // 타워 설치 시 골드 차감
+    console.log(`타워 설치: 남은 골드 ${window.userGold}`);
+  } else {
+    console.log('골드가 부족합니다. 타워를 설치할 수 없습니다.');
+  }
+  
   /* 
     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
     빠진 코드들을 채워넣어주세요! 
@@ -238,6 +244,8 @@ function initGame() {
   //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
+
+  session.socket.emit('startGame');
 }
 
 var session;
@@ -253,7 +261,6 @@ Promise.all([
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   console.log("try connect");
   session = new Session("http", "localhost", 3000);
-
   // let somewhere;
   // serverSocket = io("http://localhost:3000", {
   //   auth: {

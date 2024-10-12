@@ -9,6 +9,7 @@ import { monsterManager } from "../models/monsterSpawner.model.js";
     - 클라가 연결된 이후 호출
     - uuid 생성 및 다양한 이벤트 소켓에 등록
 ---------------------------------------------*/
+
 const registerHandler = (io) =>{
     io.on('connection', (socket)=>{
         

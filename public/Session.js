@@ -1,5 +1,3 @@
-
-import { handlerEvent } from './handlers/helper.js';
 import { Packet } from './Packet.js';
 //import { CLIENT_VERSION } from './constants.js';
 
