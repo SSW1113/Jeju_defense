@@ -10,7 +10,7 @@ class MonsterSpawner {
 
     console.log('MonsterSpawner');
 
-    // this.startSpawning();
+     this.startSpawning();
   }
 
   startSpawning() {
