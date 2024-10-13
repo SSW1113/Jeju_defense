@@ -27,12 +27,6 @@ const towers = [];
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 
-// 스테이지 관련
-let stages = null;
-let currentStage = null;
-let nextStage = null;
-let nextStageScore = Infinity;
-
 // 이미지 로딩 파트
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
@@ -55,19 +49,35 @@ for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
 
 let monsterPath;
 
-// 서버 관리 (점수, 골드)
+// 스테이지 관련
+let stages = null;
+let currentStage = null;
+let nextStage = null;
+let stageCleared = false;
+
+// 서버 관리 (점수, 골드, 스테이지 등)
 let userGold = 0; // 유저 골드
 let score = 0; // 게임 점수
+let remainMonsters = Infinity; // 남은 몬스터 숫자
+let stageMonsters = Infinity; // 스테이지 몬스터 숫자
 
-export const setUserGold = (gold) => {
-  userGold = gold;
+export const setCurrentStage = (newCurrentStage) => {
+  currentStage = newCurrentStage;
+};
+export const setUserGold = (newGold) => {
+  userGold = newGold;
 };
 export const setScore = (newScore) => {
   score = newScore;
 };
+export const setRemainMonsters = (newRemainMonsters) => {
+  remainMonsters = newRemainMonsters;
+};
 
+export const getCurrentStage = () => currentStage;
 export const getUserGold = () => userGold;
 export const getScore = () => score;
+export const getRemainMonsters = () => remainMonsters;
 
 function generateRandomMonsterPath() {
   const path = [];
@@ -190,7 +200,11 @@ function placeBase() {
 }
 
 function spawnMonster() {
-  monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+  // 스테이지 당 몬스터 숫자 제한
+  if (stageMonsters > 0) {
+    monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
+    stageMonsters--;
+  }
 }
 
 function gameLoop() {
@@ -203,12 +217,12 @@ function gameLoop() {
   ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
   ctx.fillStyle = 'white';
   ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
-  ctx.fillStyle = 'black';
-  ctx.fillText(`다음 스테이지 점수: ${nextStageScore}`, 100, 150); // 다음 스테이지 점수 표시
   ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${userGold}`, 100, 200); // 골드 표시
+  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
-  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 250); // 최고 기록 표시
+  ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
+  ctx.fillStyle = 'red';
+  ctx.fillText(`남은 몬스터: ${remainMonsters}`, 100, 250); // 현재 스테이지 남은 몬스터
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
@@ -242,19 +256,19 @@ function gameLoop() {
       monsters.splice(i, 1);
 
       // 서버로 몬스터 처치 요청 (payload: currentStage)
-      session.sendEvent(ePacketId.MonsterKill, { currentStage });
+      session.sendEvent(ePacketId.MonsterKill, { currentStage, remainMonsters });
     }
   }
 
-  if (score >= nextStageScore) {
-    const recentStage = currentStage;
-    updateCurrentStage();
+  if (remainMonsters === 0 && !stageCleared) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     session.sendEvent(ePacketId.NextStage, {
-      currentStage: recentStage,
-      nextStage: currentStage,
+      currentStage: currentStage,
+      nextStage: nextStage,
       score,
     });
+
+    stageCleared = true;
   }
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
@@ -284,33 +298,36 @@ export function initStage() {
 
   stages = gameAssets.stages.data;
   if (Array.isArray(stages) && stages.length > 0) {
-    console.log('게임 에셋 불러와서 스테이지 할당:', stages);
+    //console.log('게임 에셋 불러와서 스테이지 할당:', stages);
 
     // 초기화
     currentStage = stages[0];
-    monsterLevel = stages[0].level;
     nextStage = stages[1];
-    nextStageScore = stages[1].score;
+    monsterLevel = stages[0].id;
+    remainMonsters = stages[0].monster;
+    stageMonsters = stages[0].monster;
+    monsterSpawnInterval = stages[0].monsterSpawnInterval;
   } else {
     console.error('스테이지 데이터를 불러올 수 없습니다. stages:', stages);
     currentStage = null;
   }
 }
 
-function updateCurrentStage() {
-  // 현재 스테이지 인덱스
+export function updateCurrentStage() {
+  monsterLevel = currentStage.id;
+  remainMonsters = currentStage.monster;
+  stageMonsters = currentStage.monster;
+  monsterSpawnInterval = currentStage.monsterSpawnInterval;
+
+  // 현재 스테이지 인덱스로 다음 스테이지 인덱스 할당
   const currentStageIndex = stages.findIndex((stage) => stage.id === currentStage.id);
-  // 다음 스테이지 인덱스
   const nextStageIndex = currentStageIndex + 1;
 
   // 다음 스테이지 존재 시
   if (nextStageIndex < stages.length) {
-    // 현재 스테이지 업데이트
-    currentStage = stages[nextStageIndex];
-    monsterLevel = stages[nextStageIndex].level;
-    nextStage = nextStageIndex + 1 < stages.length ? stages[nextStageIndex + 1] : null;
-    nextStageScore =
-      nextStageIndex + 1 < stages.length ? stages[nextStageIndex + 1].score : Infinity;
+    nextStage = stages[nextStageIndex];
+
+    stageCleared = false;
   } else {
     // 마지막 스테이지일 경우
     console.log('더 이상 다음 스테이지가 없습니다.');
