@@ -40,7 +40,7 @@ export const handleDisconnect = async (socketID, uuid) => {
     3. 핸들러를 호출하여 응답 생성
     4. 클라이언트에 결과 전송
 ---------------------------------------------*/
-export const handlerEvent = (io, socket, data) => {
+export const handlerEvent = async (io, socket, data) => {
   //1. 클라이언트 버전이 지원되는지 확인
   if (!CLIENT_VERSION.includes(data.clinetVersion)) {
     socket.emit('responese', { status: 'fail', message: 'Client version mismatch' });
@@ -59,8 +59,18 @@ export const handlerEvent = (io, socket, data) => {
   }
 
   //3. 핸들러를 호출하여 응답 생성
-  const response = handler(data.userId, data.payload);
+  const response = await handler(data.userId, data.payload);
 
+  console.log(response);
   //4. 클라이언트에 결과 전송
-  socket.emit(response.packetId, response.data); //변경 후 
+  if(response.status == 'success'){
+    socket.emit('event', response); 
+  }
+
+  else if(response.status =='fail'){
+    socket.emit('response', response);
+  }
+  else{
+    console.log('response의 status값을 제대로 입력', response);
+  }
 };
