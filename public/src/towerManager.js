@@ -1,18 +1,30 @@
+import { ePacketId } from "../Packet.js";
+import { session } from "../Session.js";
 import { utils } from "../utils/utils.js";
 import { assetManager } from "./init/AssetManager.js";
+import { CoolTower, HotTower, NormalTower, StrongTower, Tower } from "./tower.js";
 
+const NUM_OF_TOWERS = 4;
+
+/*---------------------------------------------
+    [Tower Factory]
+
+        -목적: 타워 생성 로직 캡슐화
+        -장점: 유연성과 확장성 향상
+---------------------------------------------*/
 export class TowerFactory {
-    static createTower(towerId, position) {
-      
+    static createTower(towerId, position, towerImage) {
+      const newTower = assetManager.getTowerStatOrNull(towerId);
+
       switch (towerId) {
         case 0:
-          return new Tower(level);  // 마이크 생성
+          return new NormalTower(newTower, position, towerImage);  // 기본 타워 생성
         case 1:
-          return new CoolTower(level);  // 쿨하르방 생성
+          return new CoolTower(newTower, position, towerImage);  // 쿨하르방 생성
         case 2:
-          return new StrongTower(level);  // 강하르방 생성
+          return new StrongTower(newTower, position, towerImage);  // 강하르방 생성
         case 3:
-          return new HotTower(level);  // 핫하르방 생성
+          return new HotTower(newTower, position, towerImage);  // 핫하르방 생성
         default:
           return null;
       }
@@ -36,20 +48,26 @@ class TowerManager{
         for (let i = 1; i <= NUM_OF_TOWERS; i++) {
             const img = new Image();
             img.src = `images/tower${i}.png`;
-            towerImages.push(img);
+            this.towerImages.push(img);
         }
     }
 
     spawnTower(towerId, position){
-        let newMonStat = assetManager.getMonsterStatOrNull(towerId);
         try {
-            let newMon = new Monster(utils.getPath(), this.monsterImages[monsterId], monsterId, level, newMonStat.maxHp, newMonStat.hp, newMonStat.attackPower, newMonStat.speed, newMonStat.goldDrop);
-    
-            this.monsters.push(newMon);
+            let newTower = TowerFactory.createTower(towerId, position, this.towerImages[towerId]);
+            this.towers.push(newTower);
         
         } catch (error) {
             console.log(error);
         }
+    }
+
+    requestBuyTower(towerId){
+        console.log("requestBuyTower")
+        const position = utils.getRandomPositionNearPath(200);
+
+        console.log(position, "si");
+        session.sendEvent(ePacketId.BuyTower, {towerId, position});
     }
 }
 
