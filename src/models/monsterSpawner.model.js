@@ -1,6 +1,4 @@
-import { MonsterFactory } from '../utils/monsterFactory.js';
 import { ePacketId, Packet } from '../utils/packet.js';
-import { Monster } from './monster.model.js';
 
 class MonsterSpawner {
   constructor(session) {
@@ -21,11 +19,8 @@ class MonsterSpawner {
 
   createMonster() {
     const monsterId = Math.floor(Math.random() * 5);
-    //const newMon = MonsterFactory.createMonster(monsterId, 1);
     try {
-      //this.session.sendEvent(ePacketId.S2CGenMonster, newMon);
       this.session.sendEvent(ePacketId.S2CGenMonster, {monsterId, level: 1});
-      //console.log('createMonster', newMon);
     } catch (error) {
       console.log(error);
     }
