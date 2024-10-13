@@ -1,4 +1,6 @@
-import { buyTower } from "./buyTower.handler.js";
+import { S2CBuyTower } from "./S2CBuyTower.handler.js";
+import { S2CInitTower } from "./S2CInitTower.handler.js";
+import { S2CStartGame } from "./S2CStartGame.handler.js";
 import { genMonster } from "./genMonster.handler.js";
   /*---------------------------------------------
     [사용자 정의 이벤트 콜백 함수]
@@ -6,7 +8,9 @@ import { genMonster } from "./genMonster.handler.js";
 ---------------------------------------------*/
 const handlerMappings = {
   3 : genMonster,
-  41: buyTower
+  41: S2CBuyTower,
+  44: S2CStartGame,
+  45: S2CInitTower
 };
 
 export default handlerMappings
