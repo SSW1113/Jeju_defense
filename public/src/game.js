@@ -14,7 +14,7 @@ const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 const NUM_OF_TOWERS = 4;
 
-let userGold = 1000; // 유저 골드
+let userGold = 500000; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
@@ -160,11 +160,6 @@ function placeInitialTowers() {
 }
 
 function placeNewTower(towerNumber) {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-
   switch (towerNumber) {
     case 0:
       towerCost = 1000;
@@ -186,6 +181,25 @@ function placeNewTower(towerNumber) {
     session.sendEvent(ePacketId.BuyTower, payload);
 
     userGold -= towerCost;
+
+    let tower;
+    switch (towerNumber) {
+      case 0:
+        tower = new Tower(x, y, 1000, towerImages);
+        break;
+      case 1:
+        tower = new CoolTower(x, y, 1500, towerImages);
+        break;
+      case 2:
+        tower = new StrongTower(x, y, 2000, towerImages);
+        break;
+      case 3:
+        tower = new HotTower(x, y, 2500, towerImages);
+        break;
+    }
+
+    towers.push(tower);
+    tower.draw(ctx); // 타워 그리기
   } else {
     console.log('골드가 부족합니다.');
   }
@@ -196,12 +210,34 @@ function upgradeTower(towerId) {
   const upgradeCost = tower.upgradeCost;
 
   if (userGold >= upgradeCost) {
-    session.sendEvent(ePacketId.UpgradeTower, towerId);
-
+    tower.upgrade++;
+    tower.attackPower += 10 * tower.upgrade;
     userGold -= upgradeCost;
+    session.sendEvent(ePacketId.UpgradeTower, towerId);
   } else {
     console.log('골드가 부족합니다.');
   }
+
+  removeUI();
+
+  session.sendEvent(ePacketId.UpgradeTower, towerId);
+}
+
+function sellTower(towerId) {
+  const towerIndex = towers.findIndex((e) => e.id === towerId);
+  const tower = towers[towerIndex];
+  const sellPrice = (tower.cost + tower.upgrade * tower.upgradeCost) / 2;
+  userGold += sellPrice;
+
+  ctx.clearRect(tower.x, tower.y, tower.width, tower.height);
+  towers.splice(towerIndex, 1); // 타워 배열에서 삭제
+  removeUI();
+
+  towers.forEach((tower) => {
+    tower.draw(ctx);
+  });
+
+  session.sendEvent(ePacketId.SellTower, towerId);
 }
 
 function placeBase() {
@@ -275,6 +311,19 @@ function initGame() {
   placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
+  canvas.addEventListener('click', function (event) {
+    const mouseX = event.clientX - canvas.offsetLeft;
+    const mouseY = event.clientY - canvas.offsetTop;
+
+    // 타워 리스트에서 클릭된 타워를 찾음
+    const clickedTower = towers.find((tower) => tower.isClicked(mouseX, mouseY));
+
+    if (clickedTower) {
+      // 타워 클릭 처리
+      clickTower(clickedTower);
+    }
+  });
+
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
@@ -302,33 +351,6 @@ Promise.all([
   //서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다!
   //e.g. serverSocket.on("...", () => {...});
   //이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다!
-  session.socket.on('response', (data) => {
-    console.log('data: ', data); // O
-    if (data.status === 'success' && data.tower.id) {
-      const { x, y, towerNumber } = data.tower;
-
-      let tower;
-      switch (towerNumber) {
-        case 0:
-          tower = new Tower(x, y, 1000, towerImages);
-          break;
-        case 1:
-          tower = new CoolTower(x, y, 1500, towerImages);
-          break;
-        case 2:
-          tower = new StrongTower(x, y, 2000, towerImages);
-          break;
-        case 3:
-          tower = new HotTower(x, y, 2500, towerImages);
-          break;
-      }
-
-      towers.push(tower);
-      tower.draw(ctx); // 타워 그리기
-    } else if (data.status === 'fail') {
-      console.log(data.message); // 실패 메시지 출력
-    }
-  });
   if (!isInitGame) {
     initGame();
   }
@@ -354,3 +376,73 @@ createTowerButton('하르방\n$1000', 0, '10px', '10px');
 createTowerButton('쿨하르방\n$1500', 1, '60px', '10px');
 // createTowerButton('강하르방\n$1500', 2, '110px', '10px'); // 광역공격 미구현
 createTowerButton('핫하르방\n$2000', 3, '160px', '10px');
+
+function clickTower(tower) {
+  removeUI();
+
+  createUpgradeButton(tower);
+  createSellButton(tower);
+
+  showTowerInfo(tower);
+}
+
+function createUpgradeButton(tower) {
+  const upgradeButton = document.createElement('button');
+  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost}`;
+  upgradeButton.style.position = 'absolute';
+  upgradeButton.style.left = `${tower.x + 60}px`; // 타워 좌표 기준으로 위치 설정
+  upgradeButton.style.top = `${tower.y}px`;
+  upgradeButton.style.padding = '10px';
+  upgradeButton.style.fontSize = '12px';
+
+  upgradeButton.addEventListener('click', () => upgradeTower(tower.id));
+
+  document.body.appendChild(upgradeButton);
+}
+
+function createSellButton(tower) {
+  const sellButton = document.createElement('button');
+  sellButton.textContent = `판매\n${(tower.cost + tower.upgrade * tower.upgradeCost) / 2}`;
+  sellButton.style.position = 'absolute';
+  sellButton.style.left = `${tower.x + 60}px`; // 타워 좌표 기준으로 위치 설정
+  sellButton.style.top = `${tower.y + 40}px`;
+  sellButton.style.padding = '10px';
+  sellButton.style.fontSize = '12px';
+
+  // 판매 버튼 클릭 이벤트
+  sellButton.addEventListener('click', () => sellTower(tower.id));
+
+  document.body.appendChild(sellButton);
+}
+
+function showTowerInfo(tower) {
+  const infoDiv = document.createElement('div');
+  infoDiv.id = 'towerInfo';
+  infoDiv.style.position = 'absolute';
+  infoDiv.style.left = `${tower.x + 60}px`;
+  infoDiv.style.top = `${tower.y - 40}px`;
+  infoDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+  infoDiv.style.color = 'white';
+  infoDiv.style.padding = '10px';
+  infoDiv.style.borderRadius = '5px';
+
+  infoDiv.innerHTML = `
+        Level: ${tower.upgrade}, Atk: ${tower.attackPower}<br>
+    `;
+
+  document.body.appendChild(infoDiv);
+}
+
+function removeUI() {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach((button) => {
+    if (button.textContent.includes('업그레이드') || button.textContent.includes('판매')) {
+      button.remove();
+    }
+  });
+
+  const infoDiv = document.getElementById('towerInfo');
+  if (infoDiv) {
+    infoDiv.remove();
+  }
+}
