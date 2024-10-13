@@ -18,6 +18,9 @@ export const moveStageHandler = async (userId, payload) => {
   currentStages.sort((a, b) => a.stageId - b.stageId);
   const currentStage = currentStages[currentStages.length - 1];
 
+  
+  console.log('클라이언트: ', payload.currentStage.id);
+  console.log('서버: ', currentStage.id);
   // 클라이언트 (currentStage) vs 서버 (currentStage) 비교 로직
   if (currentStage.id !== payload.currentStage.id) {
     return { status: 'fail', message: 'Current stage mismatch' };
@@ -28,8 +31,6 @@ export const moveStageHandler = async (userId, payload) => {
   // 점수 검증 로직
   const serverTime = Date.now();
   const elapsedTime = (serverTime - currentStage.timestamp) / 1000;
-  const startScore = currentStage.score;
-  const clientScore = payload.score;
 
   //////////// 몬스터 처치 점수 로직 추가 //////////////
 
@@ -55,7 +56,11 @@ export const moveStageHandler = async (userId, payload) => {
   await stageManager.setStage(
     userId,
     payload.nextStage.id,
+    payload.nextStage.monster,
+    payload.nextStage.monsterSpawnInterval,
+    payload.nextStage.gold,
     payload.nextStage.score,
+    payload.nextStage.reward,
     serverTime,
   );
 
@@ -64,9 +69,13 @@ export const moveStageHandler = async (userId, payload) => {
   await goldManager.earnGold(userId, goldToAdd);
   const currentGold = await goldManager.getGold(userId);
 
+  // 업데이트된 현재 스테이지
   const stageData = await stageManager.getStage(userId);
-  // 로그 체크
-  console.log('Stage: ', stageData);
+  stageData.sort((a, b) => a.stageId - b.stageId);
+  const currentStageData = stageData[stageData.length - 1];
 
-  return { status: 'success', currentStage: stageData.id, currentGold: currentGold };
+  // 로그 체크
+  console.log('Stage: ', currentStageData);
+
+  return { status: 'success', currentStage: currentStageData, currentGold: currentGold };
 };
