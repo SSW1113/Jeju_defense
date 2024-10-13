@@ -1,8 +1,9 @@
 import { ePacketId, Packet } from './Packet.js';
 import { CLIENT_VERSION } from './constants.js';
 import { handlerEvent } from './handlers/helper.js';
-import { getRandomPositionNearPath } from './src/game.js';
 import { assetManager } from './src/init/AssetManager.js';
+import { towerManager } from './src/towerManager.js';
+import { utils } from './utils/utils.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -11,14 +12,10 @@ import { assetManager } from './src/init/AssetManager.js';
     domain: localhost
     port:3000
 ---------------------------------------------*/
-export class Session {
-  constructor(protocol, domain, port) {
-    this.socket = io.connect(`${protocol}://${domain}:${port}`, {
-      cors: { origin: '*' },
-    });
-
+class Session {
+  constructor() {
+    this.socket = null;
     this.userId = null;
-    this.Init();
   }
 
   /*---------------------------------------------
@@ -30,10 +27,11 @@ export class Session {
     3. init:
         클라가 서버와 연결될 때, GameAssets을 보내주는 이벤트
 ---------------------------------------------*/
-  Init() {
+  Init(protocol, domain, port) {
+    this.connect(protocol, domain, port);
     // 이벤트 결과
     this.socket.on('response', (data) => {
-      console.log('Server response:', data);
+      console.log('Client response:', data);
     });
 
     // 클라이언트가 서버와 연결될 때
@@ -42,8 +40,11 @@ export class Session {
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
 
       this.sendEvent(ePacketId.StartGame);
-      this.sendEvent(ePacketId.InitTower, getRandomPositionNearPath(200));
-      this.sendEvent(ePacketId.BuyTower, {towerId: 1, position: getRandomPositionNearPath(200)});
+
+      for(let i = 0; i < 2; i += 1){
+        const position = utils.getRandomPositionNearPath(200);
+        this.sendEvent(ePacketId.InitTower, {towerId: 0, position});
+      }
     });
 
     //game asset받아오기
@@ -51,10 +52,10 @@ export class Session {
       assetManager.setGameAssetsAndInit(gameAssets);
     });
 
-    this.socket.on('event', (data) => {
+    this.socket.on('event', async (data) => {
       console.log('genPacket', data);
 
-      handlerEvent(this.socket, data);
+      await handlerEvent(this.socket, data);
     });
   }
 
@@ -65,4 +66,12 @@ export class Session {
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
   }
+
+  connect(protocol, domain, port){
+    this.socket = io.connect(`${protocol}://${domain}:${port}`, {
+      cors: { origin: '*' },
+    });
+  }
 }
+
+export const session = new Session();
