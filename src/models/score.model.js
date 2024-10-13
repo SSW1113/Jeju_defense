@@ -8,13 +8,13 @@ class ScoreManager {
    * @param score
    * @param timestamp
    */
-  async addScore(uuid, scorePerStage) {
+  async addScore(uuid, score) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
       const userData = userDataJSON ? JSON.parse(userDataJSON) : { currentScore: 0, currentGold: 0, stages: [] };
 
       // 점수 증가
-      userData.currentScore += scorePerStage;
+      userData.currentScore += score;
 
       // 데이터 저장
       await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
