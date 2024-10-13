@@ -21,10 +21,11 @@ class MonsterSpawner {
 
   createMonster() {
     const monsterId = Math.floor(Math.random() * 5);
-    const newMon = MonsterFactory.createMonster(monsterId, 1);
+    //const newMon = MonsterFactory.createMonster(monsterId, 1);
     try {
-      this.session.sendEvent(ePacketId.S2CGenMonster, newMon);
-      console.log('createMonster', newMon);
+      //this.session.sendEvent(ePacketId.S2CGenMonster, newMon);
+      this.session.sendEvent(ePacketId.S2CGenMonster, {monsterId, level: 1});
+      //console.log('createMonster', newMon);
     } catch (error) {
       console.log(error);
     }
