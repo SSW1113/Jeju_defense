@@ -35,7 +35,7 @@ export const killMonsterHandler = async (userId, payload) => {
 
   // 스테이지 별 점수, 골드 증가
   const goldToAdd = currentStageData.gold;
-  const scoreToAdd = currentStageData.scorePerStage;
+  const scoreToAdd = currentStageData.score;
 
   // 골드, 점수 증가
   await goldManager.earnGold(userId, goldToAdd);
@@ -44,6 +44,7 @@ export const killMonsterHandler = async (userId, payload) => {
   const currentGold = await goldManager.getGold(userId);
   const currentScore = await scoreManager.getScore(userId);
 
-  console.log('gold: ', currentGold, 'score: ', currentScore);
-  return { status: 'success', currentGold: currentGold, currentScore: currentScore };
+  // 몬스터 킬 수 증가
+  const remainMonsters = payload.remainMonsters - 1;
+  return { status: 'success', currentGold: currentGold, currentScore: currentScore, remainMonsters };
 };
