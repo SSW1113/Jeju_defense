@@ -2,8 +2,13 @@ import { CLIENT_VERSION } from './Constant.js';
 import { Packet } from './Packet.js';
 import { loadGameAssets } from './Assets.js';
 import { initStage } from './src/game.js';
-import { setScore, setUserGold } from './src/game.js';
-
+import {
+  setCurrentStage,
+  setScore,
+  setUserGold,
+  setRemainMonsters,
+  updateCurrentStage,
+} from './src/game.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -15,15 +20,14 @@ import { setScore, setUserGold } from './src/game.js';
 export class Session {
   constructor(protocol, domain, port) {
     this.socket = io.connect(`${protocol}://${domain}:${port}`, {
-      cors: {origin: "*" }
-
+      cors: { origin: '*' },
     });
-    
+
     this.userId = null;
     this.Init();
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
     [소켓 이벤트 설정]
     1. response: 
         helper::handleEvent()에서 이벤트 처리 결과(status)를 보내는 이벤트
@@ -37,11 +41,18 @@ export class Session {
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
 
-      if(data.currentGold !== undefined) {
+      if (data.currentStage !== undefined) {
+        setCurrentStage(data.currentStage);
+        updateCurrentStage();
+      }
+      if (data.currentGold !== undefined) {
         setUserGold(data.currentGold);
       }
-      if(data.currentScore !== undefined) {
+      if (data.currentScore !== undefined) {
         setScore(data.currentScore);
+      }
+      if (data.remainMonsters !== undefined) {
+        setRemainMonsters(data.remainMonsters);
       }
     });
 
@@ -54,11 +65,11 @@ export class Session {
     });
   }
 
-/*-------------------------------------------------------------
+  /*-------------------------------------------------------------
     [패킷 전송]
     Packet(패킷ID, 유저ID, 클라이언트 버전, 내용)
 -------------------------------------------------------------*/
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
-  } 
+  }
 }
