@@ -1,41 +1,38 @@
-import { Session } from '../Session.js';
+import { session } from '../Session.js';
 import { utils } from '../utils/utils.js';
 import { Base } from './base.js';
 import { monsterManager } from './monsterManager.js';
+import { scoreAndGoldManager } from './ScoreAndGoldManager.js';
 import { CoolTower, HotTower, StrongTower, Tower } from './tower.js';
+import { towerManager } from './towerManager.js';
 /*
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
 const canvas = document.getElementById('gameCanvas');
 utils.init(canvas);
 const ctx = canvas.getContext('2d');
-const NUM_OF_TOWERS = 4;
-// let userGold = 0; // 유저 골드
+
+let userGold = 0; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 let towerCost = 1000; // 타워 구입 비용
 let numOfInitialTowers = 2; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
-const towers = [];
-let userGold = 0;
 let score = 0; // 게임 점수
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 // 이미지 로딩 파트
 const backgroundImage = new Image();
 backgroundImage.src = 'images/bg.webp';
-const towerImages = [];
-for (let i = 1; i <= NUM_OF_TOWERS; i++) {
-  const img = new Image();
-  img.src = `images/tower${i}.png`;
-  towerImages.push(img);
-}
+
 const baseImage = new Image();
 baseImage.src = 'images/base.png';
 const pathImage = new Image();
 pathImage.src = 'images/path.png';
-let monsterPath;
+
+let monsterPath; //initGame에서 초기화
+
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath();
@@ -70,23 +67,7 @@ function drawRotatedImage(image, x, y, width, height, angle) {
   ctx.drawImage(image, -width / 2, -height / 2, width, height);
   ctx.restore();
 }
-export function getRandomPositionNearPath(maxDistance) {
-  // 타워 배치를 위한 몬스터가 지나가는 경로 상에서 maxDistance 범위 내에서 랜덤한 위치를 반환하는 함수!
-  const segmentIndex = Math.floor(Math.random() * (monsterPath.length - 1));
-  const startX = monsterPath[segmentIndex].x;
-  const startY = monsterPath[segmentIndex].y;
-  const endX = monsterPath[segmentIndex + 1].x;
-  const endY = monsterPath[segmentIndex + 1].y;
-  const t = Math.random();
-  const posX = startX + t * (endX - startX);
-  const posY = startY + t * (endY - startY);
-  const offsetX = (Math.random() - 0.5) * 2 * maxDistance;
-  const offsetY = (Math.random() - 0.5) * 2 * maxDistance;
-  return {
-    x: posX + offsetX,
-    y: posY + offsetY,
-  };
-}
+
 function placeInitialTowers() {
   for (let i = 0; i < numOfInitialTowers; i++) {
     const { x, y } = getRandomPositionNearPath(200);
@@ -95,74 +76,30 @@ function placeInitialTowers() {
     tower.draw(ctx);
   }
 }
-function placeNewTower() {
-  if (window.userGold >= towerCost) {
-    const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y);
-    towers.push(tower);
-    tower.draw(ctx, towerImage);
-  }
-  /*
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요!
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
-}
-function placeNewCoolTower() {
-  /*
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요!
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new CoolTower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
-}
-function placeNewStrongTower() {
-  /*
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요!
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new StrongTower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
-}
-function placeNewHotTower() {
-  /*
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요!
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new HotTower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
-}
+
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
   base.draw(ctx, baseImage);
 }
+
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
   drawPath(monsterPath); // 경로 다시 그리기
   ctx.font = '25px Times New Roman';
   ctx.fillStyle = 'skyblue';
-  ctx.fillText(`최고 기록: ${highScore}`, 100, 50); // 최고 기록 표시
+  ctx.fillText(`최고 기록: ${scoreAndGoldManager.highScore}`, 100, 50); // 최고 기록 표시
   ctx.fillStyle = 'white';
-  ctx.fillText(`점수: ${score}`, 100, 100); // 현재 스코어 표시
+  ctx.fillText(`점수: ${scoreAndGoldManager.score}`, 100, 100); // 현재 스코어 표시
   ctx.fillStyle = 'yellow';
-  ctx.fillText(`골드: ${userGold}`, 100, 150); // 골드 표시
+  ctx.fillText(`골드: ${scoreAndGoldManager.gold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
-  //console.log(monsterManager.getMonsters());
+  
   // 타워 그리기 및 몬스터 공격 처리
-  towers.forEach((tower) => {
-    tower.draw(ctx, towerImages);
+  towerManager.towers.forEach((tower) => {
+    tower.draw(ctx);
     tower.updateCooldown();
     monsterManager.getMonsters().forEach((monster) => {
       const distance = Math.sqrt(
@@ -198,25 +135,25 @@ function initGame() {
   }
   monsterPath = utils.getPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
+  //placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
   //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
-var session;
+
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),
   // new Promise((resolve) => (towerImage.onload = resolve)),
-  ...towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...towerManager.towerImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterManager.monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   console.log('try connect');
-  session = new Session('http', 'localhost', 3000);
+  session.Init('http', 'localhost', 3000);
   // let somewhere;
   // serverSocket = io("http://localhost:3000", {
   //   auth: {
@@ -243,7 +180,7 @@ function createTowerButton(buttonName, onClickCallBack, positionTop, positionRig
   button.addEventListener('click', onClickCallBack);
   document.body.appendChild(button);
 }
-createTowerButton('하르방\n$1000', placeNewTower, '10px', '10px');
-createTowerButton('쿨하르방\n$1500', placeNewCoolTower, '60px', '10px');
-// createTowerButton('강하르방\n$1500', placeNewStrongTower, '110px', '10px'); // 광역공격 미구현
-createTowerButton('핫하르방\n$2000', placeNewHotTower, '160px', '10px');
+createTowerButton('하르방\n$1000', ()=>towerManager.requestBuyTower(0), '10px', '10px');
+createTowerButton('쿨하르방\n$1500', ()=>towerManager.requestBuyTower(1), '60px', '10px');
+//createTowerButton('강하르방\n$1500', ()=>towerManager.requestBuyTower(2), '110px', '10px'); // 광역공격 미구현
+createTowerButton('핫하르방\n$2000', ()=>towerManager.requestBuyTower(3), '160px', '10px');
