@@ -9,7 +9,9 @@
 export const ePacketId = {
   SyncGameState: 1,
   RecoverGameState: 2,
-  
+  BuyTower: 31,
+  UpgradeTower: 32,
+  SellTower: 33,
 };
 
 export class Packet {

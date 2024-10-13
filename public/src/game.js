@@ -1,3 +1,4 @@
+import { ePacketId } from '../Packet.js';
 import { Session } from '../Session.js';
 import { Base } from './base.js';
 import { Monster } from './monster.js';
@@ -13,11 +14,12 @@ const ctx = canvas.getContext('2d');
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 const NUM_OF_TOWERS = 4;
 
-let userGold = 0; // 유저 골드
+let userGold = 1000; // 유저 골드
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
+
 let numOfInitialTowers = 0; // 초기 타워 개수
 let monsterLevel = 0; // 몬스터 레벨
 let monsterSpawnInterval = 1000; // 몬스터 생성 주기
@@ -157,48 +159,49 @@ function placeInitialTowers() {
   }
 }
 
-function placeNewTower() {
+function placeNewTower(towerNumber) {
   /* 
     타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
     빠진 코드들을 채워넣어주세요! 
   */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new Tower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
+
+  switch (towerNumber) {
+    case 0:
+      towerCost = 1000;
+      break;
+    case 1:
+      towerCost = 1500;
+      break;
+    case 2:
+      towerCost = 2000;
+      break;
+    case 3:
+      towerCost = 2500;
+      break;
+  }
+
+  if (userGold >= towerCost) {
+    const { x, y } = getRandomPositionNearPath(200);
+    const payload = { x, y, towerNumber: 0 };
+    session.sendEvent(ePacketId.BuyTower, payload);
+
+    userGold -= towerCost;
+  } else {
+    console.log('골드가 부족합니다.');
+  }
 }
 
-function placeNewCoolTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new CoolTower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
-}
+function upgradeTower(towerId) {
+  const tower = towers.find((e) => e.id === towerId);
+  const upgradeCost = tower.upgradeCost;
 
-function placeNewStrongTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new StrongTower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
-}
+  if (userGold >= upgradeCost) {
+    session.sendEvent(ePacketId.UpgradeTower, towerId);
 
-function placeNewHotTower() {
-  /* 
-    타워를 구입할 수 있는 자원이 있을 때 타워 구입 후 랜덤 배치하면 됩니다.
-    빠진 코드들을 채워넣어주세요! 
-  */
-  const { x, y } = getRandomPositionNearPath(200);
-  const tower = new HotTower(x, y, towerCost, towerImages);
-  towers.push(tower);
-  tower.draw(ctx);
+    userGold -= upgradeCost;
+  } else {
+    console.log('골드가 부족합니다.');
+  }
 }
 
 function placeBase() {
@@ -299,13 +302,40 @@ Promise.all([
   //서버의 이벤트들을 받는 코드들은 여기다가 쭉 작성해주시면 됩니다!
   //e.g. serverSocket.on("...", () => {...});
   //이 때, 상태 동기화 이벤트의 경우에 아래의 코드를 마지막에 넣어주세요! 최초의 상태 동기화 이후에 게임을 초기화해야 하기 때문입니다!
+  session.socket.on('response', (data) => {
+    console.log('data: ', data); // O
+    if (data.status === 'success' && data.tower.id) {
+      const { x, y, towerNumber } = data.tower;
+
+      let tower;
+      switch (towerNumber) {
+        case 0:
+          tower = new Tower(x, y, 1000, towerImages);
+          break;
+        case 1:
+          tower = new CoolTower(x, y, 1500, towerImages);
+          break;
+        case 2:
+          tower = new StrongTower(x, y, 2000, towerImages);
+          break;
+        case 3:
+          tower = new HotTower(x, y, 2500, towerImages);
+          break;
+      }
+
+      towers.push(tower);
+      tower.draw(ctx); // 타워 그리기
+    } else if (data.status === 'fail') {
+      console.log(data.message); // 실패 메시지 출력
+    }
+  });
   if (!isInitGame) {
     initGame();
   }
 });
 
 // 버튼 만드는 함수
-function createTowerButton(buttonName, onClickCallBack, positionTop, positionRight) {
+function createTowerButton(buttonName, towerNumber, positionTop, positionRight) {
   const button = document.createElement('button');
   button.textContent = buttonName;
   button.style.position = 'absolute';
@@ -315,12 +345,12 @@ function createTowerButton(buttonName, onClickCallBack, positionTop, positionRig
   button.style.fontSize = '16px';
   button.style.cursor = 'pointer';
 
-  button.addEventListener('click', onClickCallBack);
+  button.addEventListener('click', () => placeNewTower(towerNumber));
 
   document.body.appendChild(button);
 }
 
-createTowerButton('하르방\n$1000', placeNewTower, '10px', '10px');
-createTowerButton('쿨하르방\n$1500', placeNewCoolTower, '60px', '10px');
-// createTowerButton('강하르방\n$1500', placeNewStrongTower, '110px', '10px'); // 광역공격 미구현
-createTowerButton('핫하르방\n$2000', placeNewHotTower, '160px', '10px');
+createTowerButton('하르방\n$1000', 0, '10px', '10px');
+createTowerButton('쿨하르방\n$1500', 1, '60px', '10px');
+// createTowerButton('강하르방\n$1500', 2, '110px', '10px'); // 광역공격 미구현
+createTowerButton('핫하르방\n$2000', 3, '160px', '10px');

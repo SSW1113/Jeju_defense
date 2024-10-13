@@ -1,5 +1,5 @@
 import { Packet } from './Packet.js';
-//import { CLIENT_VERSION } from './constants.js';
+import { CLIENT_VERSION } from './Constants.js';
 
 /*---------------------------------------------
     [Session 생성자]
