@@ -43,6 +43,7 @@ export class Session {
 
       this.sendEvent(ePacketId.StartGame);
       this.sendEvent(ePacketId.InitTower, getRandomPositionNearPath(200));
+      this.sendEvent(ePacketId.BuyTower, {towerId: 1, position: getRandomPositionNearPath(200)});
     });
 
     //game asset받아오기

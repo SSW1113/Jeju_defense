@@ -23,6 +23,10 @@ class AssetManager{
     getMonsterStatOrNull(monsterId){
             return this.monsters[monsterId] || null;
     }
+
+    getTowerStatOrNull(towerId){
+        return this.towers[towerId] || null;
+    }
 }
 
 export const assetManager = new AssetManager();

@@ -1,6 +1,25 @@
 import { utils } from "../utils/utils.js";
 import { assetManager } from "./init/AssetManager.js";
 
+export class TowerFactory {
+    static createTower(towerId, position) {
+      
+      switch (towerId) {
+        case 0:
+          return new Tower(level);  // 마이크 생성
+        case 1:
+          return new CoolTower(level);  // 쿨하르방 생성
+        case 2:
+          return new StrongTower(level);  // 강하르방 생성
+        case 3:
+          return new HotTower(level);  // 핫하르방 생성
+        default:
+          return null;
+      }
+    }
+  }
+  
+
 /*---------------------------------------------
     [Tower Manager]
 
@@ -21,8 +40,8 @@ class TowerManager{
         }
     }
 
-    spawnTower(towerId){
-        let newMonStat = assetManager.getMonsterStatOrNull(monsterId);
+    spawnTower(towerId, position){
+        let newMonStat = assetManager.getMonsterStatOrNull(towerId);
         try {
             let newMon = new Monster(utils.getPath(), this.monsterImages[monsterId], monsterId, level, newMonStat.maxHp, newMonStat.hp, newMonStat.attackPower, newMonStat.speed, newMonStat.goldDrop);
     

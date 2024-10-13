@@ -11,12 +11,19 @@
         -C2S: Client->Sever전송
 ---------------------------------------------*/
 export const ePacketId = {
-  SyncGameState: 1,
   RecoverGameState: 2,
   S2CGenMonster: 3,
   StartGame: 4,
   InitTower: 5,
-  S2CBuildTower: 6,
+  MonsterKill: 21,
+  BuyTower: 31,
+  SellTower: 32,
+  UpgradeTower: 33,
+  S2CMonsterKill: 40,
+  S2CBuyTower: 41,
+  S2CSellTower: 42,
+  S2CUpgradeTower: 43,
+  S2CStartGame: 44
 };
 
 export class Packet {

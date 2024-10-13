@@ -50,6 +50,7 @@ export const handlerEvent = (io, socket, data) => {
 
   //2. 패킷 ID에 해당하는 핸들러 확인
   const handler = handlerMappings[data.packetId];
+  
   //2-1. 핸들러가 존재하지 않을 경우 오류 처리
   if (!handler) {
     console.log('data.packetId: ', data.packetId);
@@ -61,5 +62,5 @@ export const handlerEvent = (io, socket, data) => {
   const response = handler(data.userId, data.payload);
 
   //4. 클라이언트에 결과 전송
-  socket.emit('response', response);
+  socket.emit(response.packetId, response.data); //변경 후 
 };
