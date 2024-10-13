@@ -6,7 +6,7 @@
 class Utils{
   constructor(){
     this.canvas = null;
-    this.path = [];
+    this.monsterPath = [];
   }
 
   init(canvas){
@@ -16,14 +16,14 @@ class Utils{
   }
 
   getPath(){
-    return this.path;
+    return this.monsterPath;
   }
 
   generateRandomMonsterPath() {
       let currentX = 0;
       let currentY = Math.floor(Math.random() * 21) + 500; // 500 ~ 520 범위의 y 시작 (캔버스 y축 중간쯤에서 시작할 수 있도록 유도)
     
-      this.path.push({ x: currentX, y: currentY });
+      this.monsterPath.push({ x: currentX, y: currentY });
     
       while (currentX < this.canvas.width) {
         currentX += Math.floor(Math.random() * 100) + 50; // 50 ~ 150 범위의 x 증가
@@ -41,9 +41,29 @@ class Utils{
           currentY = this.canvas.height;
         }
     
-        this.path.push({ x: currentX, y: currentY });
+        this.monsterPath.push({ x: currentX, y: currentY });
       }
     }
+
+  getRandomPositionNearPath(maxDistance) {
+      // 타워 배치를 위한 몬스터가 지나가는 경로 상에서 maxDistance 범위 내에서 랜덤한 위치를 반환하는 함수!
+    const segmentIndex = Math.floor(Math.random() * (this.monsterPath.length - 1));
+    const startX = this.monsterPath[segmentIndex].x;
+    const startY = this.monsterPath[segmentIndex].y;
+    const endX = this.monsterPath[segmentIndex + 1].x;
+    const endY = this.monsterPath[segmentIndex + 1].y;
+    const t = Math.random();
+    const posX = startX + t * (endX - startX);
+    const posY = startY + t * (endY - startY);
+    const offsetX = (Math.random() - 0.5) * 2 * maxDistance;
+    const offsetY = (Math.random() - 0.5) * 2 * maxDistance;
+
+    console.log(offsetX, posX);
+    return {
+      x: posX + offsetX,
+      y: posY + offsetY,
+    };
+  }
 }
 
 export const utils = new Utils();
