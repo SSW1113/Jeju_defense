@@ -2,7 +2,7 @@ export class Monster {
     /*---------------------------------------------
         [생성자]
     ---------------------------------------------*/
-  constructor(path, monsterImages, monsterId, level, maxHp, hp, attackPower, speed,  goldDrop) {
+  constructor(path, monsterImage, monsterId, level, maxHp, hp, attackPower, speed,  goldDrop) {
     // 생성자 안에서 몬스터의 속성을 정의한다고 생각하시면 됩니다!
     if (!path || path.length <= 0) {
       throw new Error('몬스터가 이동할 경로가 필요합니다.');
@@ -35,7 +35,7 @@ export class Monster {
     //리소스
     this.width = 80; // 몬스터 이미지 가로 길이
     this.height = 80; // 몬스터 이미지 세로 길이
-    this.image = monsterImages[this.monsterId]; // 몬스터 이미지
+    this.image = monsterImage; // 몬스터 이미지
     this.init(level);
   }
 

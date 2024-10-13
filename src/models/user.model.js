@@ -1,7 +1,6 @@
 import { redis } from "../utils/redis/index.js";
 import { monsterManager } from "./monsterSpawner.model.js";
 
-
 class UserManager{
     constructor(){
         this.users = [];

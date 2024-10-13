@@ -1,7 +1,8 @@
-
+import { ePacketId, Packet } from './Packet.js';
+import { CLIENT_VERSION } from './constants.js';
 import { handlerEvent } from './handlers/helper.js';
-import { Packet } from './Packet.js';
-//import { CLIENT_VERSION } from './constants.js';
+import { getRandomPositionNearPath } from './src/game.js';
+import { assetManager } from './src/init/AssetManager.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -39,14 +40,21 @@ export class Session {
     this.socket.on('connection', (data) => {
       console.log('connection: ', data);
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
+
+      this.sendEvent(ePacketId.StartGame);
+      this.sendEvent(ePacketId.InitTower, getRandomPositionNearPath(200));
     });
 
-    this.socket.on('event', (data)=>{
+    //game asset받아오기
+    this.socket.on('S2CInit',  (gameAssets) => {
+      assetManager.setGameAssetsAndInit(gameAssets);
+    });
+
+    this.socket.on('event', (data) => {
       console.log('genPacket', data);
 
       handlerEvent(this.socket, data);
-
-    })
+    });
   }
 
   /*-------------------------------------------------------------
