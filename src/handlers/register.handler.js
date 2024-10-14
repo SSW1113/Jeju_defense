@@ -9,6 +9,7 @@ import { serverAssetManager } from '../init/assets.js';
 
     - 클라가 연결된 이후 호출
     - uuid 생성 및 다양한 이벤트 소켓에 등록
+    - 모듈화와 확장성을 위해 connection패킷과 S2CInit패킷 2개를 전송
 ---------------------------------------------*/
 
 const registerHandler = (io) => {
@@ -16,8 +17,8 @@ const registerHandler = (io) => {
     //uuid 생성
     const userUUID = uuidv4();
 
-    //클라에게 정상적으로 연결됐다고 알림
-    handleConnection(socket, userUUID);
+      //클라에게 정상적으로 연결됐다고 알림
+      handleConnection(socket, userUUID);
 
       //초기화(Game Assets정보 보내주기)
       const gameAssets = serverAssetManager.getGameAssets();
