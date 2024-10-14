@@ -1,5 +1,6 @@
 import { Packet } from './Packet.js';
 import { CLIENT_VERSION } from './Constants.js';
+import { placeNewTower, upgradeTower } from './src/game.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -31,6 +32,18 @@ export class Session {
     // 이벤트 결과
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
+
+      if (data.towerCost !== undefined && data.position !== undefined) {
+        placeNewTower(data.towerCost, data.position);
+      }
+
+      if (data.towerId !== undefined) {
+        upgradeTower(data.towerId);
+      }
+
+      if (data.sellPrice !== undefined) {
+        sellTower(data.towerId, data.sellPrice);
+      }
     });
 
     // 클라이언트가 서버와 연결될 때

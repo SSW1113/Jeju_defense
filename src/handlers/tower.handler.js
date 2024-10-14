@@ -4,16 +4,19 @@ import { redis } from '../utils/redis/index.js';
 
 // 타워 구매 핸들러
 export const buyTowerHandler = async (uuid, payload) => {
+  console.log('buyTowerHandler');
   const { towerNumber, x, y } = payload;
   const towerId = uuidv4();
 
-  const userGold = await redis.get(`user:${uuid}:gold`);
-  if (!userGold) {
-    return { status: 'fail', message: '유저 골드 정보 조회 실패.' };
-  }
+  // 돈 확인
+  // const userGold = await redis.get(`user:${uuid}:gold`);
+  // if (!userGold) {
+  //   return { status: 'fail', message: '유저 골드 정보 조회 실패.' };
+  // }
 
+  // 타워 가격
   let towerCost;
-  switch (towerCost) {
+  switch (towerNumber) {
     case 0:
       towerCost = 1000;
       break;
@@ -28,16 +31,17 @@ export const buyTowerHandler = async (uuid, payload) => {
       break;
   }
 
-  if (userGold < towerCost) {
-    return { status: 'fail', message: '골드가 부족합니다.' };
-  }
+  // 돈 검증
+  // if (userGold < towerCost) {
+  //   return { status: 'fail', message: '골드가 부족합니다.' };
+  // }
 
-  const success = await towerManager.addTower(uuid, { towerId, x, y, towerNumber });
+  const success = await towerManager.addTower(uuid, { towerId, x, y, towerNumber, upgrade: 0 });
   if (!success) {
     return { status: 'fail', message: '타워 추가 실패' };
   }
 
-  return { status: 'success', message: '타워 추가 성공' };
+  return { status: 'success', position: { x, y }, towerCost: towerCost };
 };
 
 // 타워 업그레이드 핸들러
@@ -49,10 +53,11 @@ export const upgradeTowerHandler = async (uuid, payload) => {
     return { status: 'fail', message: '타워를 찾을 수 없습니다.' };
   }
 
-  const userGold = await redis.get(`user:${uuid}:gold`);
-  if (!userGold) {
-    return { status: 'fail', message: '유저 골드 정보 조회 실패.' };
-  }
+  // 돈 확인
+  // const userGold = await redis.get(`user:${uuid}:gold`);
+  // if (!userGold) {
+  //   return { status: 'fail', message: '유저 골드 정보 조회 실패.' };
+  // }
 
   let upgradeCost;
   const towerNumber = tower.towerNumber;
@@ -71,16 +76,17 @@ export const upgradeTowerHandler = async (uuid, payload) => {
       break;
   }
 
-  if (userGold < upgradeCost) {
-    return { status: 'fail', message: '골드가 부족합니다.' };
-  }
+  // 돈 검증
+  // if (userGold < upgradeCost) {
+  //   return { status: 'fail', message: '골드가 부족합니다.' };
+  // }
 
   const success = await towerManager.updateTower(towerId, { upgrade: currentUpgrade + 1 });
   if (!success) {
     return { status: 'fail', message: '타워 정보 업데이트 실패' };
   }
 
-  return { status: 'success', message: '타워 정보 업데이트 성공' };
+  return { status: 'success', towerId: towerId };
 };
 
 // 타워 판매 핸들러
@@ -98,5 +104,5 @@ export const sellTowerHandler = async (uuid, payload) => {
     return { status: 'fail', message: '타워 판매 실패' };
   }
 
-  return { status: 'success', message: '타워 판매 성공' };
+  return { status: 'success', sellPrice: sellPrice };
 };

@@ -42,7 +42,7 @@ export const handleDisconnect = async (socketID, uuid) => {
 ---------------------------------------------*/
 export const handlerEvent = (io, socket, data) => {
   //1. 클라이언트 버전이 지원되는지 확인
-  if (!CLIENT_VERSION.includes(data.clinetVersion)) {
+  if (!CLIENT_VERSION.includes(data.clientVersion)) {
     socket.emit('response', { status: 'fail', message: 'Client version mismatch' });
   }
 

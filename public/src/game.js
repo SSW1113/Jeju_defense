@@ -160,13 +160,37 @@ function placeInitialTowers() {
   }
 }
 
-function placeNewTower(towerNumber) {
+function requestBuyTower(towerNumber) {
   console.log('requestBuyTower');
   const { x, y } = getRandomPositionNearPath(200);
   session.sendEvent(ePacketId.BuyTower, { towerNumber, x, y });
 }
 
-function upgradeTower(towerId) {
+export const placeNewTower = (towerCost, position) => {
+  const { x, y } = position;
+  let tower;
+  switch (towerCost) {
+    case 1000:
+      tower = new Tower(x, y, towerCost, towerImages);
+      break;
+    case 1500:
+      tower = new CoolTower(x, y, towerCost, towerImages);
+      break;
+    case 2000:
+      tower = new StrongTower(x, y, towerCost, towerImages);
+      break;
+    case 2500:
+      tower = new HotTower(x, y, towerCost, towerImages);
+      break;
+  }
+
+  userGold -= towerCost;
+
+  towers.push(tower);
+  tower.draw(ctx);
+};
+
+function requestUpgradeTower(towerId) {
   console.log('requestUpgradeTower');
 
   const tower = towers.find((e) => e.id === towerId);
@@ -175,7 +199,15 @@ function upgradeTower(towerId) {
   session.sendEvent(ePacketId.UpgradeTower, { towerId, currentUpgrade });
 }
 
-function sellTower(towerId) {
+export const upgradeTower = (towerId) => {
+  const tower = towers.find((e) => e.id === towerId);
+  tower.upgrade++;
+  tower.attackPower + 10 * tower.upgrade;
+
+  removeUI();
+};
+
+function requestSellTower(towerId) {
   console.log('requestSellTower');
 
   const tower = towers.find((e) => e.id === towerId);
@@ -183,6 +215,22 @@ function sellTower(towerId) {
 
   session.sendEvent(ePacketId.SellTower, { towerId, sellPrice });
 }
+
+export const sellTower = (towerId, sellPrice) => {
+  userGold += sellPrice;
+
+  const towerIndex = towers.findIndex((e) => e.id === towerId);
+  const tower = towers[towerIndex];
+
+  ctx.clearRect(tower.x, tower.y, tower.width, tower.height);
+  towers.splice(towerIndex, 1);
+
+  removeUI();
+
+  towers.forEach((tower) => {
+    tower.draw(ctx);
+  });
+};
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
@@ -311,7 +359,7 @@ function createTowerButton(buttonName, towerNumber, positionTop, positionRight) 
   button.style.fontSize = '16px';
   button.style.cursor = 'pointer';
 
-  button.addEventListener('click', () => placeNewTower(towerNumber));
+  button.addEventListener('click', () => requestBuyTower(towerNumber));
 
   document.body.appendChild(button);
 }
@@ -339,7 +387,7 @@ function createUpgradeButton(tower) {
   upgradeButton.style.padding = '10px';
   upgradeButton.style.fontSize = '12px';
 
-  upgradeButton.addEventListener('click', () => upgradeTower(tower.id));
+  upgradeButton.addEventListener('click', () => requestUpgradeTower(tower.id));
 
   document.body.appendChild(upgradeButton);
 }
@@ -354,7 +402,7 @@ function createSellButton(tower) {
   sellButton.style.fontSize = '12px';
 
   // 판매 버튼 클릭 이벤트
-  sellButton.addEventListener('click', () => sellTower(tower.id));
+  sellButton.addEventListener('click', () => requestSellTower(tower.id));
 
   document.body.appendChild(sellButton);
 }
