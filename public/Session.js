@@ -7,6 +7,7 @@ import {
   setScore,
   setUserGold,
   setRemainMonsters,
+  setRemainHiddenMonsters,
   updateCurrentStage,
 } from './src/game.js';
 
@@ -53,6 +54,9 @@ export class Session {
       }
       if (data.remainMonsters !== undefined) {
         setRemainMonsters(data.remainMonsters);
+      }
+      if (data.remainHiddenMonsters !== undefined) {
+        setRemainHiddenMonsters(data.remainHiddenMonsters);
       }
     });
 

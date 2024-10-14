@@ -1,6 +1,7 @@
 import { Session } from '../Session.js';
 import { Base } from './base.js';
 import { Monster } from './monster.js';
+import { HiddenMonster } from './hiddenMonster.js';
 import { Tower } from './tower.js';
 import { ePacketId } from '../Packet.js';
 import { getGameAssets } from '../Assets.js';
@@ -23,6 +24,9 @@ let monsterLevel = 0; // 몬스터 레벨 - 스테이지
 let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
+
+const hiddenMonsters = [];
+let remainHiddenMonsters = 0;
 
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
@@ -73,11 +77,15 @@ export const setScore = (newScore) => {
 export const setRemainMonsters = (newRemainMonsters) => {
   remainMonsters = newRemainMonsters;
 };
+export const setRemainHiddenMonsters = (newRemainHiddenMonsters) => {
+  remainHiddenMonsters = newRemainHiddenMonsters;
+};
 
 export const getCurrentStage = () => currentStage;
 export const getUserGold = () => userGold;
 export const getScore = () => score;
 export const getRemainMonsters = () => remainMonsters;
+export const getRemainHiddenMonsters = () => remainHiddenMonsters;
 
 function generateRandomMonsterPath() {
   const path = [];
@@ -207,6 +215,11 @@ function spawnMonster() {
   }
 }
 
+function spawnHiddenMonster() {
+  hiddenMonsters.push(new HiddenMonster(monsterPath, monsterImages, monsterLevel * 2));
+  remainHiddenMonsters++;
+}
+
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
@@ -223,12 +236,23 @@ function gameLoop() {
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
   ctx.fillStyle = 'red';
   ctx.fillText(`남은 몬스터: ${remainMonsters}`, 100, 250); // 현재 스테이지 남은 몬스터
+  ctx.fillStyle = 'red';
+  ctx.fillText(`남은 히든 몬스터: ${remainHiddenMonsters}`, 100, 300); // 현재 스테이지 남은 히든 몬스터
 
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
     tower.draw(ctx, towerImage);
     tower.updateCooldown();
     monsters.forEach((monster) => {
+      const distance = Math.sqrt(
+        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
+      );
+      if (distance < tower.range) {
+        tower.attack(monster);
+      }
+    });
+
+    hiddenMonsters.forEach((monster) => {
       const distance = Math.sqrt(
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
       );
@@ -255,12 +279,31 @@ function gameLoop() {
       /* 몬스터가 죽었을 때 */
       monsters.splice(i, 1);
 
-      // 서버로 몬스터 처치 요청 (payload: currentStage)
+      // 서버로 몬스터 처치 요청 (payload: currentStage, remainMonsters)
       session.sendEvent(ePacketId.MonsterKill, { currentStage, remainMonsters });
     }
   }
 
-  if (remainMonsters === 0 && !stageCleared) {
+  for (let i = hiddenMonsters.length - 1; i >= 0; i--) {
+    const hiddenMonster = hiddenMonsters[i];
+    if (hiddenMonster.hp > 0) {
+      const isDestroyed = hiddenMonster.move(base);
+      if (isDestroyed) {
+        /* 게임 오버 */
+        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        location.reload();
+      }
+      hiddenMonster.draw(ctx);
+    } else {
+      /* 몬스터가 죽었을 때 */
+      hiddenMonsters.splice(i, 1);
+
+      // 서버로 몬스터 처치 요청 (payload: currentStage, remainHiddenMonsters)
+      session.sendEvent(ePacketId.HiddenMonsterKill, { currentStage, remainHiddenMonsters });
+    }
+  }
+
+  if (remainMonsters === 0 && remainHiddenMonsters === 0 && !stageCleared) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     session.sendEvent(ePacketId.NextStage, {
       currentStage: currentStage,
@@ -372,3 +415,20 @@ buyTowerButton.style.cursor = 'pointer';
 buyTowerButton.addEventListener('click', placeNewTower);
 
 document.body.appendChild(buyTowerButton);
+
+function spawnHiddenMonsterButton(buttonName, onClickCallBack, positionTop, positionRight) {
+  const button = document.createElement('button');
+  button.textContent = buttonName;
+  button.style.position = 'absolute';
+  button.style.top = positionTop;
+  button.style.right = positionRight;
+  button.style.padding = '10px 20px';
+  button.style.fontSize = '16px';
+  button.style.cursor = 'pointer';
+
+  button.addEventListener('click', onClickCallBack);
+
+  document.body.appendChild(button);
+}
+
+spawnHiddenMonsterButton('히든 몬스터 소환', spawnHiddenMonster, '60px', '10px');

@@ -11,6 +11,7 @@ export const ePacketId = {
   RecoverGameState: 2,
   NextStage: 11,
   MonsterKill: 21,
+  HiddenMonsterKill: 22,
 };
 
 export class Packet {
