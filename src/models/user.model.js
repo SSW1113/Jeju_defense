@@ -16,7 +16,7 @@ class UserManager{
                 stages: []
             };
 
-            initialData.stages.push({ id: 1, score: 0, timestamp: serverTime });
+            initialData.stages.push({ id: 0, score: 0, timestamp: serverTime });
 
             await redis.set(`user:${uuid}:data`, JSON.stringify(initialData));
             console.log(`Redis: 유저 ${uuid}에 대한 초기 데이터 생성`);
