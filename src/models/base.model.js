@@ -26,4 +26,4 @@ class BaseManager {
   }
 }
 
-export const BaseManager = new BaseManager();
+export const baseManager = new BaseManager();

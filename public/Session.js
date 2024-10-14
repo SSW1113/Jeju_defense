@@ -1,6 +1,6 @@
 import { Packet } from './Packet.js';
-import { updateHighScore, takeDamage } from './src/game.js';
-//import { CLIENT_VERSION } from './constants.js';
+import { updateHighScore, base } from './src/game.js';
+import { CLIENT_VERSION } from './Constants.js';
 
 
 /*---------------------------------------------
@@ -35,7 +35,7 @@ export class Session {
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
       if (data.baseHp !== undefined) {
-        takeDamage(data.baseHp);
+        base.takeDamage(data.baseHp);
       }
       if (data.highScore !== undefined) {
         updateHighScore(data.highScore);

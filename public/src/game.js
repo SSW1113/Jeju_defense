@@ -13,7 +13,7 @@ const ctx = canvas.getContext("2d");
 const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
 let userGold = 0; // 유저 골드
-let base; // 기지 객체
+export let base; // 기지 객체
 let baseHp = 20; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
@@ -248,7 +248,7 @@ export function takeDamage(newbaseHp) {
   baseHp = newbaseHp;
 }
 
-var session;
+export var session;
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
   new Promise((resolve) => (backgroundImage.onload = resolve)),

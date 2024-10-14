@@ -1,10 +1,9 @@
-import { BaseManager} from "../models/base.model";
+import { baseManager } from "../models/base.model.js";
 
-export const BaseDamageHandler = (uuid, payload) => {
-    const { baseHp } = payload;
+export const baseDamageHandler = async (uuid) => {
+    baseManager.updateBaseHp(uuid);
+    const getBaseHp = await baseManager.getBaseHp(uuid);
 
-    BaseManager.updateBaseHp(uuid);
-    const getBaseHp = BaseManager.getBaseHp(uuid);
-
+    console.log(getBaseHp);
     return { status: 'success', baseHp: getBaseHp };
 };
