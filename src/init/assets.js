@@ -36,6 +36,24 @@ class ServerAssetManager{
     getGameAssets(){
         return {towers: this.towers, monsters: this.monsters, stages: this.stages};  
     }
+
+    getStages(){
+      return this.stages.data;
+    }
+
+    getStageOrNull(stageId){
+      console.log(this.stages.data);
+      return this.stages.data[stageId] || null;
+    }
+
+    getTowerCost(towerId){
+      console.log();
+      return this.towers.data[towerId];
+    }
+
+    getStageMonsterOrNull(stageId){
+      return this.stages.data[stageId].monster || null;
+    }
 }
 
 export const serverAssetManager = new ServerAssetManager();

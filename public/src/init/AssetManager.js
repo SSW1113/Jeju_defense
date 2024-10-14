@@ -8,11 +8,13 @@ class AssetManager{
     constructor(){
         this.monsters = new Array();
         this.towers = new Array();
+        this.stages = new Array();
     }
 
     setGameAssetsAndInit(gameAssets){
         this.monsters = gameAssets.monsters.data;
         this.towers = gameAssets.towers.data;
+        this.stages = gameAssets.stages.data;
     }
 
 /*---------------------------------------------
@@ -26,6 +28,11 @@ class AssetManager{
 
     getTowerStatOrNull(towerId){
         return this.towers[towerId] || null;
+    }
+
+    getStages(){
+        console.log(this.stages, "this.stages")
+        return this.stages;
     }
 }
 
