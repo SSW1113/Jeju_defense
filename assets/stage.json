@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "data": [
     {
-      "id": 1,
+      "id": 0,
       "monster": 3,
-      "monsterSpawnInterval": 5000,
+      "monsterSpawnInterval": 1000,
       "gold": 10,
       "score": 100,
       "reward": 1000
     },
     {
-      "id": 2,
+      "id": 1,
       "monster": 10,
       "monsterSpawnInterval": 4500,
       "gold": 20,
@@ -19,7 +19,7 @@
       "reward": 2000
     },
     {
-      "id": 3,
+      "id": 2,
       "monster": 30,
       "monsterSpawnInterval": 4000,
       "gold": 30,
@@ -27,7 +27,7 @@
       "reward": 3000
     },
     {
-      "id": 4,
+      "id": 3,
       "monster": 40,
       "monsterSpawnInterval": 3500,
       "gold": 40,
@@ -35,7 +35,7 @@
       "reward": 4000
     },
     {
-      "id": 5,
+      "id": 4,
       "monster": 50,
       "monsterSpawnInterval": 3000,
       "gold": 50,
@@ -43,7 +43,7 @@
       "reward": 5000
     },
     {
-      "id": 6,
+      "id": 5,
       "monster": 60,
       "monsterSpawnInterval": 2500,
       "gold": 60,
@@ -51,7 +51,7 @@
       "reward": 6000
     },
     {
-      "id": 7,
+      "id": 6,
       "monster": 70,
       "monsterSpawnInterval": 2000,
       "gold": 70,
@@ -59,7 +59,7 @@
       "reward": 7000
     },
     {
-      "id": 8,
+      "id": 7,
       "monster": 80,
       "monsterSpawnInterval": 1500,
       "gold": 80,
@@ -67,7 +67,7 @@
       "reward": 8000
     },
     {
-      "id": 9,
+      "id": 8,
       "monster": 90,
       "monsterSpawnInterval": 1000,
       "gold": 90,
@@ -75,7 +75,7 @@
       "reward": 9000
     },
     {
-      "id": 10,
+      "id": 9,
       "monster": 100,
       "monsterSpawnInterval": 100,
       "gold": 100,

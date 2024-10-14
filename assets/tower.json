@@ -8,12 +8,10 @@
       "upgradeCostInc": 250,
       "width": 78,
       "height": 150,
-      "attackPower": 40,
+      "attackPower": 400,
       "range": 300,
       "cost": 1000,
-      "cooldown": 0,
-      "beamDuration": 0,
-      "towerNumber": 0,
+      "cooldown": 180,
       "beamColor": "yellow"
     },
     {
