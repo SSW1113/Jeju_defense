@@ -14,6 +14,7 @@ export const S2CStartGame = (uuid, payload)=>{
     console.log("S2CBuyTower", payload);
 
     scoreAndGoldManager.gold = payload.currentGold;
+    scoreAndGoldManager.score = payload.score;
     scoreAndGoldManager.remainMonsters = payload.remainMonsters;
     return {status: 'success'};
 }
