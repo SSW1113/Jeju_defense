@@ -58,7 +58,6 @@ class Utils{
     const offsetX = (Math.random() - 0.5) * 2 * maxDistance;
     const offsetY = (Math.random() - 0.5) * 2 * maxDistance;
 
-    console.log(offsetX, posX);
     return {
       x: posX + offsetX,
       y: posY + offsetY,
