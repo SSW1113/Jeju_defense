@@ -33,6 +33,7 @@ const registerHandler = (io) => {
 
     let session = sessionManager.register(userUUID, socket);
     monsterManager.addSpanwer(session);
+    monsterManager.startSpawn(session.uuid, 0);
   });
 };
 
