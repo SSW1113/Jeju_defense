@@ -1,4 +1,5 @@
 import { Packet } from './Packet.js';
+import { updateHighScore } from './src/game.js';
 //import { CLIENT_VERSION } from './constants.js';
 
 
@@ -33,6 +34,9 @@ export class Session {
     // 이벤트 결과
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
+      if(data.highScore !== undefined){
+        updateHighScore(data.highScore);
+      }
     });
 
     // 클라이언트가 서버와 연결될 때
