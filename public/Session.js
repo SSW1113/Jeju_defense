@@ -2,8 +2,8 @@ import { ePacketId, Packet } from './Packet.js';
 import { CLIENT_VERSION } from './constants.js';
 import { handlerEvent } from './handlers/helper.js';
 import { assetManager } from './src/init/AssetManager.js';
-import { towerManager } from './src/towerManager.js';
 import { utils } from './utils/utils.js';
+
 
 /*---------------------------------------------
     [Session 생성자]
@@ -31,11 +31,11 @@ class Session {
     this.connect(protocol, domain, port);
     // 이벤트 결과
     this.socket.on('response', (data) => {
-      console.log('Client response:', data);
+      console.log('Server response:', data);
     });
 
     // 클라이언트가 서버와 연결될 때
-    this.socket.on('connection', (data) => {
+    this.socket.on('connection', async (data) => {
       console.log('connection: ', data);
       this.userId = data.uuid; // 서버에서 받은 UUID 저장
 
@@ -48,6 +48,7 @@ class Session {
     });
 
     //game asset받아오기
+    //별도의 요청없이 클라 접속 시, 서버가 game Asset전송
     this.socket.on('S2CInit',  (gameAssets) => {
       assetManager.setGameAssetsAndInit(gameAssets);
     });
@@ -56,6 +57,13 @@ class Session {
       console.log('genPacket', data);
 
       await handlerEvent(this.socket, data);
+/*-------------------------------------------------------------
+    [변경 시작]]
+-------------------------------------------------------------*/
+      await initStage();
+/*-------------------------------------------------------------
+    [변경 끝]
+-------------------------------------------------------------*/
     });
   }
 
@@ -66,7 +74,6 @@ class Session {
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
   }
-
   connect(protocol, domain, port){
     this.socket = io.connect(`${protocol}://${domain}:${port}`, {
       cors: { origin: '*' },

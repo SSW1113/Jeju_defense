@@ -4,6 +4,7 @@ import { createServer } from "http";
 import initSocket from "./init/socket.js";
 import { serverAssetManager } from "./init/assets.js";
 
+
 dotenv.config();
 
 const app = express();
@@ -25,7 +26,6 @@ server.listen(PORT, async () => {
     console.log(assets);
     console.log("성공");
 } catch (error) {
-    console.log("err: "+error.message)
+    console.error("err: "+error.message)
 }
-
 });
