@@ -7,8 +7,25 @@ class UserManager {
 
   async addUser(uuid) {
     try {
-      await redis.set(`user:${uuid}:data`, JSON.stringify([]));
-      console.log(`Redis: 유저 ${uuid}에 대한 빈 배열 생성`);
+      const serverTime = Date.now();
+      const initialData = {
+        currentScore: 0, // 초기 점수
+        currentGold: 0, // 초기 골드
+        stages: [],
+        towers: [],
+      };
+
+      initialData.stages.push({ id: 1, score: 0, timestamp: serverTime });
+      // initialData.towers.push({
+      //   towerId: 'fc1ab506-9398-4d9f-8b10-499bcaa8c7a4',
+      //   x: 1182.2641812587503,
+      //   y: 341.1542535393114,
+      //   towerNumber: 0,
+      //   upgrade: 0,
+      // });
+
+      await redis.set(`user:${uuid}:data`, JSON.stringify(initialData));
+      console.log(`Redis: 유저 ${uuid}에 대한 초기 데이터 생성`);
 
       return true;
     } catch (error) {

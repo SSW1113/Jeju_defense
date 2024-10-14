@@ -33,11 +33,7 @@ export class Session {
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
 
-      if (
-        data.towerCost !== undefined &&
-        data.position !== undefined &&
-        data.towerId !== undefined
-      ) {
+      if (data.tower !== undefined) {
         placeNewTower(data.towerCost, data.position, data.towerId);
       }
 
