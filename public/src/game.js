@@ -126,6 +126,9 @@ function gameLoop() {
 
   if (scoreAndGoldManager.remainMonsters === 0) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
+    console.log(scoreAndGoldManager);
+
+    
     session.sendEvent(ePacketId.NextStage, {
       stageId: scoreAndGoldManager.monsterLevel,
       score: scoreAndGoldManager.score

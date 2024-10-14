@@ -12,7 +12,7 @@ class UserManager{
             const serverTime = Date.now();
             const initialData = {
                 score: 0,  // 초기 점수
-                currentGold: 0,   // 초기 골드
+                gold: 0,   // 초기 골드
                 stages: [],
                 towers: []
             };

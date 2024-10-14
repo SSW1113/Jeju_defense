@@ -14,7 +14,7 @@ class ScoreManager {
       const userData =JSON.parse(userDataJSON);
 
       // 점수 증가
-      userData.currentScore += score;
+      userData.score += score;
 
       // 데이터 저장
       await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
@@ -34,7 +34,7 @@ class ScoreManager {
 
       if (userData) {
         // currentScore 반환
-        return userData.currentScore;
+        return userData.score;
       } else {
         console.log(`사용자 ${uuid}의 데이터가 없습니다.`);
         return 0;

@@ -50,5 +50,5 @@ export const killMonsterHandler = async (userId, payload) => {
   // 몬스터 킬 수 증가
   const remainMonsters = payload.remainMonsters - 1;
 
-  return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {currentGold, currentScore, remainMonsters }};
+  return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainMonsters }};
 };

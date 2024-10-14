@@ -34,7 +34,7 @@ class StageManager {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
       const userData = userDataJSON
         ? JSON.parse(userDataJSON)
-        : { currentScore: 0, currentGold: 0, stages: [] };
+        : { score: 0, gold: 0, stages: [] };
 
       return userData.stages;
     } catch (err) {

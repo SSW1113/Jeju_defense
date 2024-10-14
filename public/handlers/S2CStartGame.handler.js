@@ -13,7 +13,7 @@ import { towerManager } from "../src/towerManager.js";
 export const S2CStartGame = (uuid, payload)=>{
     console.log("S2CBuyTower", payload);
 
-    scoreAndGoldManager.gold = payload.currentGold;
+    scoreAndGoldManager.gold = payload.gold;
     scoreAndGoldManager.score = payload.score;
     scoreAndGoldManager.remainMonsters = payload.remainMonsters;
     return {status: 'success'};

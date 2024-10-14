@@ -13,7 +13,7 @@ class GoldManager {
       const userData = JSON.parse(userDataJSON) 
 
       // 골드 증가
-      userData.currentGold += gold;
+      userData.gold += gold;
 
       // 데이터 저장
       await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
@@ -32,8 +32,8 @@ class GoldManager {
       const userData = userDataJSON ? JSON.parse(userDataJSON) : null;
 
       if (userData) {
-        // currentGold 반환
-        return userData.currentGold;
+        // gold 반환
+        return userData.gold;
       } else {
         console.log(`사용자 ${uuid}의 데이터가 없습니다.`);
         return 0;

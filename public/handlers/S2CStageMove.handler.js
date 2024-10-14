@@ -7,7 +7,7 @@ import { towerManager } from "../src/towerManager.js";
 export const S2CStageMove = (uuid, payload)=>{
     console.log("S2CStageMove", payload);
 
-    scoreAndGoldManager.gold = payload.currentGold;
+    scoreAndGoldManager.gold = payload.gold;
     scoreAndGoldManager.monsterLevel = payload.currentStage;
     scoreAndGoldManager.remainMonsters = payload.remainMonsters;
 

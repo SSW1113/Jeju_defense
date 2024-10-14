@@ -20,7 +20,7 @@ export const buyTower = async (uuid, payload) => {
       return { status: 'fail', message: '유효하지 않은 towerId입니다.' };
     }
     
-    const userGold = userData.currentGold;
+    const userGold = userData.gold;
     console.log("towerCost: ", towerCost);
     console.log("userGold: ", userGold);
     // 유저의 골드로 살 수 있는지 검증
@@ -33,11 +33,11 @@ export const buyTower = async (uuid, payload) => {
   userData.towers.push(position);
 
   // 골드 차감
-  userData.currentGold = userGold - towerCost;
+  userData.gold = userGold - towerCost;
 
   // 업데이트된 전체 유저 데이터를 Redis에 저장
   await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
 
   console.log(`Redis: 유저 ${uuid}의 타워 추가됨, 골드 차감됨`);
-  return { status: 'success', packetId: ePacketId.S2CBuyTower, payload: { towerId, position, currentGold: userData.currentGold } };
+  return { status: 'success', packetId: ePacketId.S2CBuyTower, payload: { towerId, position, gold: userData.gold } };
 };

@@ -75,5 +75,5 @@ export const moveStageHandler = async (userId, payload) => {
   //몬스터 스폰
   monsterManager.startSpawn(userId, payload.stageId+1);
 
-  return { status: 'success', packetId: ePacketId.S2CStageMove, payload: {currentStage: payload.stageId+1, currentGold: currentGold, remainMonsters: nextStageInfo.monster}};
+  return { status: 'success', packetId: ePacketId.S2CStageMove, payload: {currentStage: payload.stageId+1, gold: currentGold, remainMonsters: nextStageInfo.monster}};
 };

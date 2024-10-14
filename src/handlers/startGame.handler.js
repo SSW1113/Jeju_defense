@@ -8,7 +8,7 @@ export const startGame = async (uuid, payload) => {
   const userData = JSON.parse(userDataJSON);
 
   // 유저 데이터를 초기화
-  userData.currentGold = 2000;  // 기존 currentGold 대신 gold로 통일
+  userData.gold = 2000;  // 기존 currentGold 대신 gold로 통일
   userData.score = 0;
   userData.stage = 0;
 
@@ -23,5 +23,5 @@ export const startGame = async (uuid, payload) => {
   await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
   
   // 클라이언트에 초기화된 데이터를 반환
-  return { status: 'success', packetId: ePacketId.S2CStartGame, payload: { currentGold: userData.currentGold, score: userData.score, remainMonsters } };
+  return { status: 'success', packetId: ePacketId.S2CStartGame, payload: { gold: userData.gold, score: userData.score, remainMonsters } };
 };
