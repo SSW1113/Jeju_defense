@@ -20,7 +20,7 @@ export const gameEnd = (uuid, payload) => {
     }
     //redis 모르겠다
     if (score > redis.HighScore) {
-
+        HighScore = score;
     }
 
     return { status: 'success' };
