@@ -21,7 +21,8 @@ export const ePacketId = {
   S2CSellTower: 42,
   S2CUpgradeTower: 43,
   S2CStartGame: 44,
-  S2CInitTower: 45
+  S2CInitTower: 45,
+  S2CStageMove: 46
 };
 
 export class Packet {
