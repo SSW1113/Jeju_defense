@@ -16,6 +16,7 @@ class Session {
   constructor() {
     this.socket = null;
     this.userId = null;
+    this.isGameAssetsLoaded = false;
   }
 
   /*---------------------------------------------
@@ -51,19 +52,13 @@ class Session {
     //별도의 요청없이 클라 접속 시, 서버가 game Asset전송
     this.socket.on('S2CInit',  (gameAssets) => {
       assetManager.setGameAssetsAndInit(gameAssets);
+      this.isGameAssetsLoaded = true;
     });
 
     this.socket.on('event', async (data) => {
       console.log('genPacket', data);
 
       await handlerEvent(this.socket, data);
-/*-------------------------------------------------------------
-    [변경 시작]]
--------------------------------------------------------------*/
-      await initStage();
-/*-------------------------------------------------------------
-    [변경 끝]
--------------------------------------------------------------*/
     });
   }
 
@@ -74,9 +69,23 @@ class Session {
   sendEvent(packetId, payload) {
     this.socket.emit('event', new Packet(packetId, this.userId, CLIENT_VERSION, payload));
   }
+
   connect(protocol, domain, port){
     this.socket = io.connect(`${protocol}://${domain}:${port}`, {
       cors: { origin: '*' },
+    });
+  }
+
+  waitForGameAssets() {
+    return new Promise((resolve) => {
+      const checkAssetsLoaded = () => {
+        if (this.isGameAssetsLoaded) {
+          resolve();  // 자산이 로드되면 resolve
+        } else {
+          setTimeout(checkAssetsLoaded, 200);  
+        }
+      };
+      checkAssetsLoaded();  // 자산 상태 체크 시작
     });
   }
 }
