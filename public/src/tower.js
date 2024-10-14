@@ -1,5 +1,6 @@
 export class Tower {
   constructor(towerInfo, position, towerImage) {
+    
   /*---------------------------------------------
         [멤버 변수]
   ---------------------------------------------*/
@@ -63,6 +64,7 @@ export class Tower {
       this.target = monster; // 광선의 목표 설정
     }
   }
+  
 /*---------------------------------------------
   [타워 업그레이드]
 ---------------------------------------------*/
@@ -83,8 +85,8 @@ export class Tower {
   -공격 속도 계산 
 ---------------------------------------------*/
   updateCooldown() {
-    if (this.cooldown > 0) {
-      this.cooldown--;
+    if (this.currentCooldown > 0) {
+      this.currentCooldown--;
     }
   }
 
