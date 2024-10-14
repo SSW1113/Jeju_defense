@@ -1,3 +1,4 @@
+import { CLIENT_VERSION } from '../Constants.js';
 import { ePacketId } from '../Packet.js';
 import { Session } from '../Session.js';
 import { Base } from './base.js';
@@ -160,84 +161,27 @@ function placeInitialTowers() {
 }
 
 function placeNewTower(towerNumber) {
-  switch (towerNumber) {
-    case 0:
-      towerCost = 1000;
-      break;
-    case 1:
-      towerCost = 1500;
-      break;
-    case 2:
-      towerCost = 2000;
-      break;
-    case 3:
-      towerCost = 2500;
-      break;
-  }
-
-  if (userGold >= towerCost) {
-    const { x, y } = getRandomPositionNearPath(200);
-    const payload = { x, y, towerNumber: 0 };
-    session.sendEvent(ePacketId.BuyTower, payload);
-
-    userGold -= towerCost;
-
-    let tower;
-    switch (towerNumber) {
-      case 0:
-        tower = new Tower(x, y, 1000, towerImages);
-        break;
-      case 1:
-        tower = new CoolTower(x, y, 1500, towerImages);
-        break;
-      case 2:
-        tower = new StrongTower(x, y, 2000, towerImages);
-        break;
-      case 3:
-        tower = new HotTower(x, y, 2500, towerImages);
-        break;
-    }
-
-    towers.push(tower);
-    tower.draw(ctx); // 타워 그리기
-  } else {
-    console.log('골드가 부족합니다.');
-  }
+  console.log('requestBuyTower');
+  const position = getRandomPositionNearPath(200);
+  session.sendEvent(ePacketId.BuyTower, { towerNumber, position });
 }
 
 function upgradeTower(towerId) {
+  console.log('requestUpgradeTower');
+
   const tower = towers.find((e) => e.id === towerId);
-  const upgradeCost = tower.upgradeCost;
+  const currentUpgrade = tower.upgrade;
 
-  if (userGold >= upgradeCost) {
-    tower.upgrade++;
-    tower.attackPower += 10 * tower.upgrade;
-    userGold -= upgradeCost;
-    session.sendEvent(ePacketId.UpgradeTower, towerId);
-  } else {
-    console.log('골드가 부족합니다.');
-  }
-
-  removeUI();
-
-  session.sendEvent(ePacketId.UpgradeTower, towerId);
+  session.sendEvent(ePacketId.UpgradeTower, { towerId, currentUpgrade });
 }
 
 function sellTower(towerId) {
-  const towerIndex = towers.findIndex((e) => e.id === towerId);
-  const tower = towers[towerIndex];
+  console.log('requestSellTower');
+
+  const tower = towers.find((e) => e.id === towerId);
   const sellPrice = (tower.cost + tower.upgrade * tower.upgradeCost) / 2;
-  userGold += sellPrice;
 
-  ctx.clearRect(tower.x, tower.y, tower.width, tower.height);
-  towers.splice(towerIndex, 1); // 타워 배열에서 삭제
-  removeUI();
-
-  towers.forEach((tower) => {
-    tower.draw(ctx);
-  });
-
-  session.sendEvent(ePacketId.SellTower, towerId);
+  session.sendEvent(ePacketId.SellTower, { towerId, sellPrice });
 }
 
 function placeBase() {
