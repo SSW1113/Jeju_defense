@@ -5,8 +5,6 @@ export const loadGameAssets = (assets) => {
     gameAssets = {
       stages: assets.stages
     };
-
-    console.log(gameAssets.stages);
     return gameAssets;
   } catch (err) {
     throw new Error('Failed to load game assets: ' + err.message);

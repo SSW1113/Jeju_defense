@@ -23,7 +23,6 @@ server.listen(PORT, async () => {
 
   try {
     const assets = await serverAssetManager.loadGameAssets();
-    console.log(assets);
     console.log("성공");
 } catch (error) {
     console.error("err: "+error.message)

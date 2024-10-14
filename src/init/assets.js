@@ -42,17 +42,19 @@ class ServerAssetManager{
     }
 
     getStageOrNull(stageId){
-      console.log(this.stages.data);
       return this.stages.data[stageId] || null;
     }
 
     getTowerCost(towerId){
-      console.log();
       return this.towers.data[towerId];
     }
 
     getStageMonsterOrNull(stageId){
       return this.stages.data[stageId].monster || null;
+    }
+
+    getStageClearGoldOrNull(stageId){
+      return this.stages.data[stageId].reward || null;;
     }
 }
 
