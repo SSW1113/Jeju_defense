@@ -11,7 +11,7 @@ class ScoreManager {
   async addScore(uuid, score) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON ? JSON.parse(userDataJSON) : { currentScore: 0, currentGold: 0, stages: [] };
+      const userData =JSON.parse(userDataJSON);
 
       // 점수 증가
       userData.currentScore += score;

@@ -1,3 +1,4 @@
+import { scoreAndGoldManager } from "../src/ScoreAndGoldManager.js";
 import { towerManager } from "../src/towerManager.js";
 
   /*---------------------------------------------
@@ -12,6 +13,6 @@ import { towerManager } from "../src/towerManager.js";
 export const S2CBuyTower = (uuid, payload)=>{
     console.log("S2CBuyTower")
     towerManager.spawnTower(payload.towerId, payload.position);
-    
+    scoreAndGoldManager.gold = payload.currentGold;
     return {status: 'success'};
 }
