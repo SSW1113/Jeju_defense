@@ -9,7 +9,7 @@ export const S2CMonsterKill = (uuid, payload)=>{
   
     scoreAndGoldManager.gold = payload.currentGold;
     scoreAndGoldManager.score = payload.currentScore;
-    scoreAndGoldManager.remainMonsters = remainMonsters;
+    scoreAndGoldManager.remainMonsters -=1;
     
     return {status: 'success'};
 }

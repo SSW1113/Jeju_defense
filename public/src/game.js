@@ -32,23 +32,6 @@ pathImage.src = 'images/path.png';
 
 let monsterPath; //initGame에서 초기화
 
-/*---------------------------------------------
-    [변경 시작]
----------------------------------------------*/
-// 스테이지 관련
-let stages = null;
-let currentStage = null;
-let nextStage = null;
-let stageCleared = false;
-
-
-export const setCurrentStage = (newCurrentStage) => {
-  currentStage = newCurrentStage;
-};
-
-  /*---------------------------------------------
-    [변경 끝]
----------------------------------------------*/
 function initMap() {
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 그리기
   drawPath();
@@ -84,15 +67,6 @@ function drawRotatedImage(image, x, y, width, height, angle) {
   ctx.restore();
 }
 
-function placeInitialTowers() {
-  for (let i = 0; i < numOfInitialTowers; i++) {
-    const { x, y } = getRandomPositionNearPath(200);
-    const tower = new Tower(x, y, towerCost, towerImages);
-    towers.push(tower);
-    tower.draw(ctx);
-  }
-}
-
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
   base = new Base(lastPoint.x, lastPoint.y, baseHp);
@@ -113,15 +87,9 @@ function gameLoop() {
   ctx.fillText(`골드: ${scoreAndGoldManager.gold}`, 100, 150); // 골드 표시
   ctx.fillStyle = 'black';
   ctx.fillText(`현재 레벨: ${scoreAndGoldManager.monsterLevel}`, 100, 200); // 최고 기록 표시
-  
-  /*---------------------------------------------
-    [변경 시작]
----------------------------------------------*/
   ctx.fillStyle = 'red';
   ctx.fillText(`남은 몬스터: ${scoreAndGoldManager.remainMonsters}`, 100, 250); // 현재 스테이지 남은 몬스터
-/*---------------------------------------------
-    [변경 끝]
----------------------------------------------*/
+
 
   // 타워 그리기 및 몬스터 공격 처리
   towerManager.towers.forEach((tower) => {
@@ -153,7 +121,6 @@ function gameLoop() {
 
       monsterManager.monsters.splice(i, 1);
       // 서버로 몬스터 처치 요청 (payload: currentStage)
-      scoreAndGoldManager.remainMonsters-=1;
       const remainMonsters= scoreAndGoldManager.remainMonsters;
       const currentStage = scoreAndGoldManager.monsterLevel;
 
@@ -161,7 +128,8 @@ function gameLoop() {
     }
   }
 
-  if (scoreAndGoldManager.remainMonsters === 0 && !stageCleared) {
+  console.log(scoreAndGoldManager.remainMonsters)
+  if (scoreAndGoldManager.remainMonsters === 0) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     session.sendEvent(ePacketId.NextStage, {
       stageId: scoreAndGoldManager.monsterLevel,
@@ -179,10 +147,10 @@ function initGame() {
   console.log("initGame");
   monsterPath = utils.getPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
-  //initStage();
+
   //placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
-  //setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
+
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
@@ -190,24 +158,6 @@ function initGame() {
 /*---------------------------------------------
     [변경 시작]
 ---------------------------------------------*/
-// function initStage() {
-//   stages = assetManager.getStages();
-//   if (stages.length > 0) {
-//     //console.log('게임 에셋 불러와서 스테이지 할당:', stages);
-
-//     // 초기화
-//     currentStage = stages[0];
-//     nextStage = stages[1];
-//     monsterLevel = stages[0].id;
-//     remainMonsters = stages[0].monster;
-//     stageMonsters = stages[0].monster;
-//     monsterSpawnInterval = stages[0].monsterSpawnInterval;
-//   } else {
-//     console.error('스테이지 데이터를 불러올 수 없습니다. stages:', stages);
-//     currentStage = null;
-//   }
-// }
-
 // export function updateCurrentStage() {
 //   monsterLevel = currentStage.id;
 //   remainMonsters = currentStage.monster;
