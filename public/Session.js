@@ -42,10 +42,10 @@ class Session {
 
       this.sendEvent(ePacketId.StartGame);
 
-      // for(let i = 0; i < 2; i += 1){
-      //   const position = utils.getRandomPositionNearPath(200);
-      //   this.sendEvent(ePacketId.InitTower, {towerId: 0, position});
-      // }
+      for(let i = 0; i < 2; i += 1){
+        const position = utils.getRandomPositionNearPath(200);
+        this.sendEvent(ePacketId.InitTower, {towerId: 0, position});
+      }
     });
 
     //game asset받아오기

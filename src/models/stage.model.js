@@ -12,7 +12,9 @@ class StageManager {
   async setStage(uuid, id, monster, gold, score, timestamp) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = JSON.parse(userDataJSON)
+      const userData = userDataJSON
+        ? JSON.parse(userDataJSON)
+        : { currentScore: 0, currentGold: 0, stages: [] };
 
       // 스테이지 추가
       userData.stages.push({ id, monster, gold, score, timestamp });

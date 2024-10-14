@@ -57,7 +57,7 @@ class MonsterManager {
 
    addSpanwer(session) {
     try {
-      //this.spawners.set(session.uuid, new MonsterSpawner(session));
+      this.spawners.set(session.uuid, new MonsterSpawner(session));
       console.log('addSpawner');
     } catch (error) {
       console.log(error);

@@ -11,10 +11,9 @@ class UserManager{
         try {
             const serverTime = Date.now();
             const initialData = {
-                score: 0,  // 초기 점수
+                currentScore: 0,  // 초기 점수
                 currentGold: 0,   // 초기 골드
-                stages: [],
-                towers: []
+                stages: []
             };
 
             initialData.stages.push({ id: 0, score: 0, timestamp: serverTime });
