@@ -2,6 +2,7 @@ import { stageManager } from "../models/stage.model.js";
 import { goldManager } from "../models/gold.model.js";
 import { serverAssetManager } from "../init/assets.js";
 import { ePacketId } from "../utils/packet.js";
+import { monsterManager } from "../models/monsterSpawner.model.js";
 
 /**
  * 스테이지 이동 핸들러
@@ -30,58 +31,36 @@ export const moveStageHandler = async (userId, payload) => {
     return { status: 'fail', message: 'Current stage mismatch' };
   }
 
-  const { stages } =  serverAssetManager.getStages();
-
   // 점수 검증 로직
   const serverTime = Date.now();
-  const elapsedTime = (serverTime - currentStage.timestamp) / 1000;
+
 
   //////////// 몬스터 처치 점수 로직 추가 //////////////
 
-  // 경과 시간(elapsedTime)에 따라 예상 점수 계산
-  // const expectedScore = startScore + elapsedTime;
 
-  /*
-  // 클라이언트 점수 vs 서버 점수 비교 (오차 5)
-  const tolerance = 5;
-
-  // 오차 범위 벗어나면 fail
-  if (Math.abs(expectedScore - clientScore) > tolerance) {
-    return { status: 'fail', message: 'Invalid Score' };
-  }
-  */
-
- // 게임 에셋에서 다음 스테이지(nextStage)의 존재 여부 확인
+ // 다음 스테이지(nextStage) 존재  확인
  const nextStageInfo = serverAssetManager.getStageOrNull(payload.stageId+1);
   if (!nextStageInfo) {
     return { status: 'fail', message: 'Next Stage does not exist' };
   }
 
-  // 유저의 스테이지 정보 업데이트
-
+  // redis에 스테이지 클리어 정보 기록
   await stageManager.setStage(
     userId,
     nextStageInfo.id,
-    nextStageInfo.monster,
-    nextStageInfo.monsterSpawnInterval,
     nextStageInfo.gold,
     nextStageInfo.score,
-    nextStageInfo.reward,
     serverTime,
   );
-  // await stageManager.setStage(
-  //   userId,
-  //   payload.nextStage.id,
-  //   payload.nextStage.monster,
-  //   payload.nextStage.monsterSpawnInterval,
-  //   payload.nextStage.gold,
-  //   payload.nextStage.score,
-  //   payload.nextStage.reward,
-  //   serverTime,
-  // );
+
 
   // 스테이지 클리어 보상
-  const goldToAdd = payload.currentStage.reward;
+
+  const goldToAdd = serverAssetManager.getStageClearGoldOrNull(payload.stageId);
+  if (!goldToAdd) {
+    return { status: 'fail', message: 'StageID가 유효하지 않습니다.' };
+  }
+
   await goldManager.earnGold(userId, goldToAdd);
   const currentGold = await goldManager.getGold(userId);
 
@@ -91,7 +70,10 @@ export const moveStageHandler = async (userId, payload) => {
   const currentStageData = stageData[stageData.length - 1];
 
   // 로그 체크
-  console.log('Stage: ', currentStageData);
+  //console.log('Stage: ', currentStageData);
 
-  return { status: 'success', packetId: ePacketId.S2CStageMove, currentStage: currentStageData, currentGold: currentGold };
+  //몬스터 스폰
+  monsterManager.startSpawn(userId, payload.stageId+1);
+
+  return { status: 'success', packetId: ePacketId.S2CStageMove, payload: {currentStage: payload.stageId+1, currentGold: currentGold, remainMonsters: nextStageInfo.monster}};
 };
