@@ -9,7 +9,7 @@ const handlerMappings = {
   5: initTower,
   11: moveStageHandler,
   21: killMonsterHandler,
-  31: buyTower
+  31: buyTower,
 };
 
 export default handlerMappings;
