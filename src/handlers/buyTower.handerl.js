@@ -38,11 +38,11 @@ export const buyTower = async (uuid, payload) => {
 
   console.log(towers);
   // 업데이트된 배열을 Redis에 저장
-  await redis.set(towerKey, JSON.stringify(towers));
+  await redis.set(`user:${uuid}:towers`, JSON.stringify(towers));
 
   //골드 차감
   const updatedGold = userGold-towerCost;
-  await redis.set(goldKey, updatedGold.toString());
+  await redis.set(`user:${uuid}:gold`, updatedGold.toString());
 
   console.log(`Redis: 유저 ${uuid}의 타워 추가됨`);
   return { status: 'success', packetId: ePacketId.S2CBuyTower, payload: {towerId, position} };
