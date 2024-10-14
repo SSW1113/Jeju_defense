@@ -1,6 +1,6 @@
 import { Packet } from './Packet.js';
 import { CLIENT_VERSION } from './Constants.js';
-import { placeNewTower, upgradeTower } from './src/game.js';
+import { placeNewTower, upgradeTower, sellTower } from './src/game.js';
 
 /*---------------------------------------------
     [Session 생성자]
@@ -33,8 +33,12 @@ export class Session {
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
 
-      if (data.towerCost !== undefined && data.position !== undefined) {
-        placeNewTower(data.towerCost, data.position);
+      if (
+        data.towerCost !== undefined &&
+        data.position !== undefined &&
+        data.towerId !== undefined
+      ) {
+        placeNewTower(data.towerCost, data.position, data.towerId);
       }
 
       if (data.towerId !== undefined) {

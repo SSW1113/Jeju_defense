@@ -1,10 +1,8 @@
 import { towerManager } from '../models/tower.model.js';
 import { v4 as uuidv4 } from 'uuid';
-import { redis } from '../utils/redis/index.js';
 
 // 타워 구매 핸들러
 export const buyTowerHandler = async (uuid, payload) => {
-  console.log('buyTowerHandler');
   const { towerNumber, x, y } = payload;
   const towerId = uuidv4();
 
@@ -36,19 +34,21 @@ export const buyTowerHandler = async (uuid, payload) => {
   //   return { status: 'fail', message: '골드가 부족합니다.' };
   // }
 
-  const success = await towerManager.addTower(uuid, { towerId, x, y, towerNumber, upgrade: 0 });
+  const success = await towerManager.addTower(towerId, { towerId, x, y, towerNumber, upgrade: 0 });
   if (!success) {
     return { status: 'fail', message: '타워 추가 실패' };
   }
 
-  return { status: 'success', position: { x, y }, towerCost: towerCost };
+  return { status: 'success', towerId: towerId, position: { x, y }, towerCost: towerCost };
 };
 
 // 타워 업그레이드 핸들러
 export const upgradeTowerHandler = async (uuid, payload) => {
-  const { towerId, currentUpgrade } = payload;
+  const towerId = payload;
+  console.log('towerId: ', towerId);
 
   const tower = await towerManager.getTower(towerId);
+  console.log('tower: ', tower);
   if (!tower) {
     return { status: 'fail', message: '타워를 찾을 수 없습니다.' };
   }
@@ -81,7 +81,13 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   //   return { status: 'fail', message: '골드가 부족합니다.' };
   // }
 
-  const success = await towerManager.updateTower(towerId, { upgrade: currentUpgrade + 1 });
+  const success = await towerManager.updateTower(towerId, {
+    towerId: towerId,
+    x: tower.x,
+    y: tower.y,
+    towerNumber: tower.towerNumber,
+    upgrade: tower.upgrade + 1,
+  });
   if (!success) {
     return { status: 'fail', message: '타워 정보 업데이트 실패' };
   }
@@ -104,5 +110,5 @@ export const sellTowerHandler = async (uuid, payload) => {
     return { status: 'fail', message: '타워 판매 실패' };
   }
 
-  return { status: 'success', sellPrice: sellPrice };
+  return { status: 'success', towerId: towerId, sellPrice: sellPrice };
 };

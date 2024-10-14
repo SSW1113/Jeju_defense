@@ -1,4 +1,3 @@
-import { CLIENT_VERSION } from '../Constants.js';
 import { ePacketId } from '../Packet.js';
 import { Session } from '../Session.js';
 import { Base } from './base.js';
@@ -166,23 +165,25 @@ function requestBuyTower(towerNumber) {
   session.sendEvent(ePacketId.BuyTower, { towerNumber, x, y });
 }
 
-export const placeNewTower = (towerCost, position) => {
+export const placeNewTower = (towerCost, position, towerId) => {
   const { x, y } = position;
   let tower;
   switch (towerCost) {
     case 1000:
-      tower = new Tower(x, y, towerCost, towerImages);
+      tower = new Tower(x, y, towerCost, towerImages, towerId);
       break;
     case 1500:
-      tower = new CoolTower(x, y, towerCost, towerImages);
+      tower = new CoolTower(x, y, towerCost, towerImages, towerId);
       break;
     case 2000:
-      tower = new StrongTower(x, y, towerCost, towerImages);
+      tower = new StrongTower(x, y, towerCost, towerImages, towerId);
       break;
     case 2500:
-      tower = new HotTower(x, y, towerCost, towerImages);
+      tower = new HotTower(x, y, towerCost, towerImages, towerId);
       break;
   }
+
+  console.log('tower: ', tower);
 
   userGold -= towerCost;
 
@@ -192,17 +193,15 @@ export const placeNewTower = (towerCost, position) => {
 
 function requestUpgradeTower(towerId) {
   console.log('requestUpgradeTower');
-
-  const tower = towers.find((e) => e.id === towerId);
-  const currentUpgrade = tower.upgrade;
-
-  session.sendEvent(ePacketId.UpgradeTower, { towerId, currentUpgrade });
+  console.log('towerId: ', towerId);
+  session.sendEvent(ePacketId.UpgradeTower, towerId);
 }
 
 export const upgradeTower = (towerId) => {
   const tower = towers.find((e) => e.id === towerId);
   tower.upgrade++;
-  tower.attackPower + 10 * tower.upgrade;
+  tower.attackPower += 10;
+  userGold -= tower.upgradeCost;
 
   removeUI();
 };
@@ -382,7 +381,7 @@ function createUpgradeButton(tower) {
   const upgradeButton = document.createElement('button');
   upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost}`;
   upgradeButton.style.position = 'absolute';
-  upgradeButton.style.left = `${tower.x + 60}px`; // 타워 좌표 기준으로 위치 설정
+  upgradeButton.style.left = `${tower.x + 320}px`; // 타워 좌표 기준으로 위치 설정
   upgradeButton.style.top = `${tower.y}px`;
   upgradeButton.style.padding = '10px';
   upgradeButton.style.fontSize = '12px';
@@ -394,9 +393,9 @@ function createUpgradeButton(tower) {
 
 function createSellButton(tower) {
   const sellButton = document.createElement('button');
-  sellButton.textContent = `판매\n${(tower.cost + tower.upgrade * tower.upgradeCost) / 2}`;
+  sellButton.textContent = `판매\n$${(tower.cost + tower.upgrade * tower.upgradeCost) / 2}`;
   sellButton.style.position = 'absolute';
-  sellButton.style.left = `${tower.x + 60}px`; // 타워 좌표 기준으로 위치 설정
+  sellButton.style.left = `${tower.x + 320}px`; // 타워 좌표 기준으로 위치 설정
   sellButton.style.top = `${tower.y + 40}px`;
   sellButton.style.padding = '10px';
   sellButton.style.fontSize = '12px';
@@ -411,7 +410,7 @@ function showTowerInfo(tower) {
   const infoDiv = document.createElement('div');
   infoDiv.id = 'towerInfo';
   infoDiv.style.position = 'absolute';
-  infoDiv.style.left = `${tower.x + 60}px`;
+  infoDiv.style.left = `${tower.x + 320}px`;
   infoDiv.style.top = `${tower.y - 40}px`;
   infoDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
   infoDiv.style.color = 'white';

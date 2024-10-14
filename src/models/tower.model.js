@@ -1,5 +1,4 @@
 import { redis } from '../utils/redis/index.js';
-import { v4 as uuidv4 } from 'uuid';
 
 class TowerManager {
   constructor() {
@@ -8,7 +7,7 @@ class TowerManager {
 
   async addTower(uuid, towerData) {
     try {
-      await redis.set(`tower${uuid}: data`, JSON.stringify(towerData));
+      await redis.set(`tower:${uuid}:data`, JSON.stringify(towerData));
       console.log(`Redis: 타워${uuid}에 대한 데이터 저장`);
 
       return true;
@@ -22,6 +21,7 @@ class TowerManager {
   async getTower(uuid) {
     try {
       const data = await redis.get(`tower:${uuid}:data`);
+
       return JSON.parse(data);
     } catch (error) {
       console.log(`Redis: 데이터 가져오기 오류: `, error);

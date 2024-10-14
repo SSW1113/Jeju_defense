@@ -1,8 +1,9 @@
 export class Tower {
-  constructor(x, y, cost, towerImages) {
+  constructor(x, y, cost, towerImages, id) {
     // 생성자 안에서 타워들의 속성을 정의한다고 생각하시면 됩니다!
     this.x = x; // 타워 이미지 x 좌표
     this.y = y; // 타워 이미지 y 좌표
+    this.id = id; // 타워 고유 Id
     this.upgrade = 0; // 타워 업그레이드 상태
     this.upgradeCost = cost / 2; // 기본 업그레이드 비용 (구매 가격의 절반)
     this.width = 78; // 타워 이미지 가로 길이 (이미지 파일 길이에 따라 변경 필요하며 세로 길이와 비율을 맞춰주셔야 합니다!)
@@ -60,8 +61,8 @@ export class Tower {
 
 // 슬로우 공격을 하는 타워 (쿨하르방)
 export class CoolTower extends Tower {
-  constructor(x, y, cost, towerImages, upgrade, upgradeCost) {
-    super(x, y, cost, towerImages, upgrade, upgradeCost);
+  constructor(x, y, cost, towerImages, upgrade, upgradeCost, id) {
+    super(x, y, cost, towerImages, upgrade, upgradeCost, id);
     this.attackPower = 40;
     this.range = 300;
     this.cooldown = 180;
@@ -85,8 +86,8 @@ export class CoolTower extends Tower {
 
 // 느린 광역 공격을 하는 타워 (강하르방)
 export class StrongTower extends Tower {
-  constructor(x, y, cost, towerImages, upgrade, upgradeCost) {
-    super(x, y, cost, towerImages, upgrade, upgradeCost);
+  constructor(x, y, cost, towerImages, upgrade, upgradeCost, id) {
+    super(x, y, cost, towerImages, upgrade, upgradeCost, id);
     this.attackPower = 100;
     this.range = 400;
     this.cooldown = 0;
@@ -109,8 +110,8 @@ export class StrongTower extends Tower {
 
 // 공속이 빠른 타워 (핫하르방)
 export class HotTower extends Tower {
-  constructor(x, y, cost, towerImages, upgrade, upgradeCost) {
-    super(x, y, cost, towerImages, upgrade, upgradeCost);
+  constructor(x, y, cost, towerImages, upgrade, upgradeCost, id) {
+    super(x, y, cost, towerImages, upgrade, upgradeCost, id);
     this.attackPower = 60;
     this.range = 300;
     this.cooldown = 0;
