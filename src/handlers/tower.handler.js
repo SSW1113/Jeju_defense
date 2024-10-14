@@ -2,6 +2,7 @@ import { towerManager } from '../models/tower.model.js';
 import { v4 as uuidv4 } from 'uuid';
 import { redis } from '../utils/redis/index.js';
 
+// 타워 구매 핸들러
 export const buyTowerHandler = async (uuid, payload) => {
   const { towerNumber, x, y } = payload;
   const towerId = uuidv4();
@@ -39,6 +40,7 @@ export const buyTowerHandler = async (uuid, payload) => {
   return { status: 'success', message: '타워 추가 성공' };
 };
 
+// 타워 업그레이드 핸들러
 export const upgradeTowerHandler = async (uuid, payload) => {
   const { towerId, currentUpgrade } = payload;
 
@@ -81,6 +83,7 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   return { status: 'success', message: '타워 정보 업데이트 성공' };
 };
 
+// 타워 판매 핸들러
 export const sellTowerHandler = async (uuid, payload) => {
   const { towerId, sellPrice } = payload;
 

@@ -162,8 +162,8 @@ function placeInitialTowers() {
 
 function placeNewTower(towerNumber) {
   console.log('requestBuyTower');
-  const position = getRandomPositionNearPath(200);
-  session.sendEvent(ePacketId.BuyTower, { towerNumber, position });
+  const { x, y } = getRandomPositionNearPath(200);
+  session.sendEvent(ePacketId.BuyTower, { towerNumber, x, y });
 }
 
 function upgradeTower(towerId) {
