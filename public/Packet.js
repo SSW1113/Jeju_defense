@@ -9,7 +9,7 @@
 export const ePacketId = {
   SyncGameState: 1,
   RecoverGameState: 2,
-  
+  TakeDamage: 51
 };
 
 export class Packet {
@@ -18,5 +18,6 @@ export class Packet {
     this.userId = userId; //요청을 보내는 유저의 ID
     this.clientVersion = clientVersion; //현재 클라이언트 버전 (”1.0.0”) (고정)
     this.payload = payload; // JSON 데이터, 요청 내용
+
   }
 }

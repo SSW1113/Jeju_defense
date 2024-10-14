@@ -14,7 +14,7 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
 
 let userGold = 0; // 유저 골드
 let base; // 기지 객체
-let baseHp = 0; // 기지 체력
+let baseHp = 20; // 기지 체력
 
 let towerCost = 0; // 타워 구입 비용
 let numOfInitialTowers = 0; // 초기 타워 개수
@@ -169,10 +169,6 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
-export function updateHighScore(score) {
-  highScore = score;
-}
-
 function spawnMonster() {
   monsters.push(new Monster(monsterPath, monsterImages, monsterLevel));
 }
@@ -192,6 +188,7 @@ function gameLoop() {
   ctx.fillStyle = "black";
   ctx.fillText(`현재 레벨: ${monsterLevel}`, 100, 200); // 최고 기록 표시
 
+  
   // 타워 그리기 및 몬스터 공격 처리
   towers.forEach((tower) => {
     tower.draw(ctx, towerImage);
@@ -241,6 +238,14 @@ function initGame() {
   setInterval(spawnMonster, monsterSpawnInterval); // 설정된 몬스터 생성 주기마다 몬스터 생성
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
+}
+
+export function updateHighScore(score) {
+  highScore = score;
+}
+
+export function takeDamage(newbaseHp) {
+  baseHp = newbaseHp;
 }
 
 var session;

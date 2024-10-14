@@ -1,6 +1,5 @@
 import { redis } from "../utils/redis/index.js";
 
-
 class UserManager{
     constructor(){
         this.users = [];
@@ -13,6 +12,7 @@ class UserManager{
                 currentScore: 0,  // 초기 점수
                 highScore: 0,
                 currentGold: 0,   // 초기 골드
+                baseHp: 20,
                 stages: []
             };
 

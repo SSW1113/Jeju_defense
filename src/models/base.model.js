@@ -1,23 +1,29 @@
-const BaseMaxHP = 20;
+import { redis } from "../utils/redis/index.js";
 
-const userBase = {};
+class BaseManager {
+  async getBaseHp(uuid){
+    try{
+      const userDataJSON = await redis.get(`user:${uuid}:data`);
+      const userData = userDataJSON ? JSON.parse(userDataJSON) : { currentScore: 0, highScore: 0, currentGold: 0, baseHp: 20, stages: [] };
 
-// 게임 시작 시 베이스 체력 초기화
-export const initBase = (uuid) => {
-  userBase[uuid] = BaseMaxHP;
-};
+      return userData.baseHp;
+    }catch (err) {
+      console.log('Redis: 처리 오류:', err);
+    }
+  }
 
-// 베이스 체력 설정
-export const setBaseHp = (uuid, baseHp) => {
-  userBase[uuid] = baseHp;
-};
+  async updateBaseHp(uuid) {
+    try {
+      const userDataJSON = await redis.get(`user:${uuid}:data`);
+      const userData = userDataJSON ? JSON.parse(userDataJSON) : { currentScore: 0, highScore: 0, currentGold: 0, baseHp: 20, stages: [] };
 
-// 베이스 체력 가져오기
-export const getBaseHp = (uuid) => {
-  return userBase[uuid];
-};
+      userData.baseHp--;
 
-// 베이스 정보 삭제
-export const removeBase = (uuid) => {
-  delete userBase.uuid;
-};
+      await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
+    } catch (err) {
+      console.log('Redis: 처리 오류:', err);
+    }
+  }
+}
+
+export const BaseManager = new BaseManager();

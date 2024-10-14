@@ -1,13 +1,10 @@
-import { getBaseHp, setBaseHp } from "../models/base.model";
+import { BaseManager} from "../models/base.model";
 
 export const BaseDamageHandler = (uuid, payload) => {
     const { baseHp } = payload;
 
-    if (getBaseHp(uuid) < baseHp) {
-        return { status: 'fail', message: 'base HP mismatch' };
-    }
+    BaseManager.updateBaseHp(uuid);
+    const getBaseHp = BaseManager.getBaseHp(uuid);
 
-    setBaseHp(baseHp);
-
-    return { status: 'success', message: 'base damaged' };
+    return { status: 'success', baseHp: getBaseHp };
 };
