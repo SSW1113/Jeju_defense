@@ -46,7 +46,7 @@ class ServerAssetManager{
     }
 
     getTowerCost(towerId){
-      return this.towers.data[towerId];
+      return this.towers.data[towerId].cost;
     }
 
     getStageMonsterOrNull(stageId){

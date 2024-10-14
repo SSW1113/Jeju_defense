@@ -10,7 +10,7 @@ class GoldManager {
   async earnGold(uuid, gold) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON ? JSON.parse(userDataJSON) : { currentScore: 0, currentGold: 0, stages: [] };
+      const userData = JSON.parse(userDataJSON) 
 
       // 골드 증가
       userData.currentGold += gold;
