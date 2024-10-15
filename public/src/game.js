@@ -159,31 +159,31 @@ function placeInitialTowers() {
   }
 }
 
+// 타워 구매 요청
 function requestBuyTower(towerNumber) {
   console.log('requestBuyTower');
   const { x, y } = getRandomPositionNearPath(200);
   session.sendEvent(ePacketId.BuyTower, { towerNumber, x, y });
 }
 
-export const placeNewTower = (towerCost, position, towerId) => {
-  const { x, y } = position;
+// 타워 설치
+export const placeNewTower = (towerData) => {
+  const { towerId, x, y, towerNumber } = towerData;
   let tower;
-  switch (towerCost) {
-    case 1000:
-      tower = new Tower(x, y, towerCost, towerImages, towerId);
+  switch (towerNumber) {
+    case 0:
+      tower = new Tower(x, y, 1000, towerImages, towerId);
       break;
-    case 1500:
-      tower = new CoolTower(x, y, towerCost, towerImages, towerId);
+    case 1:
+      tower = new CoolTower(x, y, 1500, towerImages, towerId);
       break;
-    case 2000:
-      tower = new StrongTower(x, y, towerCost, towerImages, towerId);
+    case 2:
+      tower = new StrongTower(x, y, 2000, towerImages, towerId);
       break;
-    case 2500:
-      tower = new HotTower(x, y, towerCost, towerImages, towerId);
+    case 3:
+      tower = new HotTower(x, y, 2500, towerImages, towerId);
       break;
   }
-
-  console.log('tower: ', tower);
 
   userGold -= towerCost;
 
@@ -191,12 +191,14 @@ export const placeNewTower = (towerCost, position, towerId) => {
   tower.draw(ctx);
 };
 
+// 타워 업그레이드 요청
 function requestUpgradeTower(towerId) {
   console.log('requestUpgradeTower');
   console.log('towerId: ', towerId);
   session.sendEvent(ePacketId.UpgradeTower, towerId);
 }
 
+// 타워 업그레이드
 export const upgradeTower = (towerId) => {
   const tower = towers.find((e) => e.id === towerId);
   tower.upgrade++;
@@ -206,6 +208,7 @@ export const upgradeTower = (towerId) => {
   removeUI();
 };
 
+// 타워 판매 요청
 function requestSellTower(towerId) {
   console.log('requestSellTower');
 
@@ -215,15 +218,14 @@ function requestSellTower(towerId) {
   session.sendEvent(ePacketId.SellTower, { towerId, sellPrice });
 }
 
+// 타워 판매
 export const sellTower = (towerId, sellPrice) => {
-  userGold += sellPrice;
-
   const towerIndex = towers.findIndex((e) => e.id === towerId);
   const tower = towers[towerIndex];
 
   ctx.clearRect(tower.x, tower.y, tower.width, tower.height);
   towers.splice(towerIndex, 1);
-
+  userGold += sellPrice;
   removeUI();
 
   towers.forEach((tower) => {

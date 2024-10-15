@@ -8,16 +8,15 @@ class TowerManager {
   async addTower(uuid, towerData) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON;
-
-      console.log('userData:', userData);
-      console.log('userData.towers: ', userData.towers);
+      const userData = JSON.parse(userDataJSON);
 
       // 타워 추가
       userData.towers.push(towerData);
 
       // 데이터 저장
       await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
+
+      return true;
     } catch (err) {
       console.log('Redis: 처리 오류:', err);
 
@@ -28,9 +27,9 @@ class TowerManager {
   async getTower(uuid, towerId) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON;
+      const userData = JSON.parse(userDataJSON);
 
-      const towerIndex = userData.towers.findIndex((e) => e.id === towerId);
+      const towerIndex = userData.towers.findIndex((e) => e.towerId === towerId);
 
       return userData.towers[towerIndex];
     } catch (error) {
@@ -42,12 +41,11 @@ class TowerManager {
   async updateTower(uuid, towerId, updatedTowerData) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON;
-      const towerIndex = userData.towers.findIndex((e) => e.id === towerId);
-
+      const userData = JSON.parse(userDataJSON);
+      const towerIndex = userData.towers.findIndex((e) => e.towerId === towerId);
       userData.towers[towerIndex] = updatedTowerData;
 
-      await redis.set(`user:${uuid}:data`, JSON.stringify(updatedTowerData));
+      await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
       console.log(`Redis: 타워 ${uuid}의 데이터 업데이트 완료`);
 
       return true;
@@ -61,8 +59,8 @@ class TowerManager {
   async removeTower(uuid, towerId) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
-      const userData = userDataJSON;
-      const towerIndex = userData.towers.findIndex((e) => e.id === towerId);
+      const userData = JSON.parse(userDataJSON);
+      const towerIndex = userData.towers.findIndex((e) => e.towerId === towerId);
 
       userData.towers.splice(towerIndex, 1);
 

@@ -34,7 +34,7 @@ export class Session {
       console.log('Server response:', data);
 
       if (data.tower !== undefined) {
-        placeNewTower(data.towerCost, data.position, data.towerId);
+        placeNewTower(data.tower);
       }
 
       if (data.towerId !== undefined) {

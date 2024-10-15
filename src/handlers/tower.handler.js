@@ -34,7 +34,15 @@ export const buyTowerHandler = async (uuid, payload) => {
   //   return { status: 'fail', message: '골드가 부족합니다.' };
   // }
 
-  const success = await towerManager.addTower(uuid, { towerId, x, y, towerNumber, upgrade: 0 });
+  const towerData = {
+    towerId: towerId,
+    x: x,
+    y: y,
+    towerNumber: towerNumber,
+    upgrade: 0,
+  };
+
+  const success = await towerManager.addTower(uuid, towerData);
   if (!success) {
     return { status: 'fail', message: '타워 추가 실패' };
   }
@@ -110,5 +118,5 @@ export const sellTowerHandler = async (uuid, payload) => {
     return { status: 'fail', message: '타워 판매 실패' };
   }
 
-  return { status: 'success', sellPrice: sellPrice };
+  return { status: 'success', towerId: towerId, sellPrice: sellPrice };
 };
