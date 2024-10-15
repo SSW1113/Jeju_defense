@@ -17,7 +17,7 @@
       44. S2CStartGame: 게임 시작(동기화)-서버에게 기본 골드, 점수, 남은 몬스터 수 update
       45. S2CInitTower: 최초 타워 추가(동기화)-서버에게 받은 towerId로 타워 생성
       46: S2CStageMove: 스테이지 클리어(동기화)-스테이지 클리어 보상 획득
-      51: TakeDamage: 기지 피격 이벤트
+      51: BaseDamaged: 기지 피격 이벤트
 
     [주의사항]  
         - 대문자로 시작하기
@@ -39,7 +39,7 @@ export const ePacketId = {
   S2CStartGame: 44,
   S2CInitTower: 45,
   S2CStageMove: 46,
-  TakeDamage: 51
+  BaseDamaged: 51
 };
 
 export class Packet {

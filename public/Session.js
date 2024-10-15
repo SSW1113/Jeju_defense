@@ -1,5 +1,7 @@
+
+import { CLIENT_VERSION } from './Constants.js';
 import { ePacketId, Packet } from './Packet.js';
-import { CLIENT_VERSION } from './constants.js';
+
 import { handlerEvent } from './handlers/helper.js';
 import { assetManager } from './src/init/AssetManager.js';
 import { utils } from './utils/utils.js';
@@ -8,7 +10,7 @@ import { utils } from './utils/utils.js';
     [Session 생성자]
 
     protocol: http
-    domain: localhost
+    domain: localhost 
     port:3000
 ---------------------------------------------*/
 class Session {

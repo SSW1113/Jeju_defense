@@ -6,7 +6,6 @@
 
     [주의사항] 
         - 대문자로 시작하기
-        - issue번호에 따라 만들기
         -S2C: Server->Client 전송
         -C2S: Client->Sever전송
 ---------------------------------------------*/
@@ -26,7 +25,8 @@ export const ePacketId = {
   S2CUpgradeTower: 43,
   S2CStartGame: 44,
   S2CInitTower: 45,
-  S2CStageMove: 46
+  S2CStageMove: 46,
+  BaseDamaged: 51
 };
 
 export class Packet {
