@@ -13,8 +13,7 @@ utils.init(canvas);
 const ctx = canvas.getContext('2d');
 
 let base; // 기지 객체
-let baseHp = 0; // 기지 체력
-
+let baseHp = 20; // 기지 체력
 let isInitGame = false;
 
 // 이미지 로딩 파트
@@ -136,6 +135,7 @@ function gameLoop() {
   ctx.fillText(`남은 몬스터: ${scoreAndGoldManager.remainMonsters}`, 100, 250); // 현재 스테이지 남은 몬스터
 
 
+  
   // 타워 그리기 및 몬스터 공격 처리
   towerManager.towers.forEach((tower) => {
     tower.draw(ctx);
@@ -219,6 +219,20 @@ function initGame() {
   gameLoop(); // 게임 루프 최초 실행
   isInitGame = true;
 }
+
+/*---------------------------------------------
+    [변경 시작]
+---------------------------------------------*/
+export function updateHighScore(score) {
+  highScore = score;
+}
+
+export function takeDamage(newbaseHp) {
+  baseHp = newbaseHp;
+}
+/*---------------------------------------------
+    [변경 끝]
+---------------------------------------------*/
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([

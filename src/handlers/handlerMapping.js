@@ -4,6 +4,7 @@ import { startGame } from './startGame.handler.js';
 import { moveStageHandler } from "./stage.handler.js";
 import { killMonsterHandler } from "./monster.handler.js";
 import { buyTowerHandler, sellTowerHandler, upgradeTowerHandler } from './tower.handler.js';
+import { baseDamageHandler } from './base.handler.js';
 
 const handlerMappings = {
   [ePacketId.StartGame]: startGame,
@@ -13,6 +14,7 @@ const handlerMappings = {
   [ePacketId.BuyTower]: buyTowerHandler,
   [ePacketId.UpgradeTower]: upgradeTowerHandler,
   [ePacketId.SellTower]: sellTowerHandler,
+  [ePacketId.BaseDamaged]: baseDamageHandler
 };
 
 export default handlerMappings;
