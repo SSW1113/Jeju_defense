@@ -8,7 +8,7 @@ export class HiddenMonster extends Monster {
   draw(ctx) {
     ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
     ctx.font = "bold 14px Arial";
-    ctx.fillStyle = "red";
+    ctx.fillStyle = "yellow";
     ctx.fillText(
       `(레벨 ${this.level}) ${this.hp}/${this.maxHp}`,
       this.x,

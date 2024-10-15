@@ -29,10 +29,24 @@ const towers = [];
 /////////////// 히든 몬스터 정보 /////////////////
 const hiddenMonsters = [];
 let remainHiddenMonsters = 0;
+
+const hiddenMonsterImages = [];
+for (let i = 1; i <= 1; i++) {
+  const img = new Image();
+  img.src = `images/gold_monster.png`;
+  hiddenMonsterImages.push(img);
+}
 /////////////// 보스 몬스터 정보 /////////////////
 const bossMonsters = []; // 쌍둥이 보스 등 확장 보류
 let bossAppear = false;
 let bossKilled = false;
+
+const bossMonsterImages = [];
+for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
+  const img = new Image();
+  img.src = `images/boss_monster${i}.png`;
+  bossMonsterImages.push(img);
+}
 /////////////////////////////////////////////////
 
 let highScore = 0; // 기존 최고 점수
@@ -235,12 +249,12 @@ function spawnMonster() {
 
 //////////////////// 히든, 보스 몬스터 생성 //////////////////////
 function spawnHiddenMonster() {
-  hiddenMonsters.push(new HiddenMonster(monsterPath, monsterImages, monsterLevel * 2));
+  hiddenMonsters.push(new HiddenMonster(monsterPath, hiddenMonsterImages, monsterLevel * 2));
   remainHiddenMonsters++;
 }
 
 function spawnBossMonster() {
-  bossMonsters.push(new BossMonster(monsterPath, monsterImages, monsterLevel * 3));
+  bossMonsters.push(new BossMonster(monsterPath, bossMonsterImages, monsterLevel * 3));
 }
 /////////////////////////////////////////////////////////////////
 
@@ -448,6 +462,8 @@ Promise.all([
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...hiddenMonsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...bossMonsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(() => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   session = new Session('http', 'localhost', 3000);
