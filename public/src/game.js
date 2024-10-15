@@ -25,8 +25,13 @@ let monsterSpawnInterval = 5000; // 몬스터 생성 주기
 const monsters = [];
 const towers = [];
 
+/////////////// 히든 몬스터 정보 /////////////////
 const hiddenMonsters = [];
 let remainHiddenMonsters = 0;
+/////////////// 보스 몬스터 정보 /////////////////
+const bossMonsters = []; // 쌍둥이 보스 등 확장 보류
+let bossKilled = false;
+/////////////////////////////////////////////////
 
 let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
@@ -260,6 +265,15 @@ function gameLoop() {
         tower.attack(monster);
       }
     });
+
+    bossMonsters.forEach((monster) => {
+      const distance = Math.sqrt(
+        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
+      );
+      if (distance < tower.range) {
+        tower.attack(monster);
+      }
+    });
   });
 
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
@@ -299,7 +313,26 @@ function gameLoop() {
       hiddenMonsters.splice(i, 1);
 
       // 서버로 몬스터 처치 요청 (payload: currentStage, remainHiddenMonsters)
-      session.sendEvent(ePacketId.HiddenMonsterKill, { currentStage, remainHiddenMonsters });
+      session.sendEvent(ePacketId.MonsterKill, { currentStage, remainHiddenMonsters });
+    }
+  }
+
+  for (let i = bossMonsters.length - 1; i >= 0; i--) {
+    const bossMonster = bossMonsters[i];
+    if (bossMonster.hp > 0) {
+      const isDestroyed = bossMonster.move(base);
+      if (isDestroyed) {
+        /* 게임 오버 */
+        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        location.reload();
+      }
+      bossMonster.draw(ctx);
+    } else {
+      /* 몬스터가 죽었을 때 */
+      bossMonsters.splice(i, 1);
+
+      // 서버로 몬스터 처치 요청 (payload: currentStage, bossKilled)
+      session.sendEvent(ePacketId.HiddenMonsterKill, { currentStage, bossKilled });
     }
   }
 
