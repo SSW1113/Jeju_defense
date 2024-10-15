@@ -14,6 +14,7 @@ const ctx = canvas.getContext('2d');
 
 let base; // 기지 객체
 let baseHp = 0; // 기지 체력
+
 let isInitGame = false;
 
 // 이미지 로딩 파트
@@ -61,6 +62,55 @@ function drawRotatedImage(image, x, y, width, height, angle) {
   ctx.drawImage(image, -width / 2, -height / 2, width, height);
   ctx.restore();
 }
+
+/*---------------------------------------------
+    [변경 시작]
+---------------------------------------------*/
+// 타워 업그레이드 요청
+function requestUpgradeTower(towerId) {
+  console.log('requestUpgradeTower');
+  console.log('towerId: ', towerId);
+  session.sendEvent(ePacketId.UpgradeTower, towerId);
+}
+
+// 타워 업그레이드
+export const upgradeTower = (towerId) => {
+  const tower = towers.find((e) => e.id === towerId);
+  tower.upgrade++;
+  tower.attackPower += 10;
+  userGold -= tower.upgradeCost;
+
+  removeUI();
+};
+
+// 타워 판매 요청
+function requestSellTower(towerId) {
+  console.log('requestSellTower');
+
+  const tower = towers.find((e) => e.id === towerId);
+  const sellPrice = (tower.cost + tower.upgrade * tower.upgradeCost) / 2;
+
+  session.sendEvent(ePacketId.SellTower, { towerId, sellPrice });
+}
+
+// 타워 판매
+export const sellTower = (towerId, sellPrice) => {
+  const towerIndex = towers.findIndex((e) => e.id === towerId);
+  const tower = towers[towerIndex];
+
+  ctx.clearRect(tower.x, tower.y, tower.width, tower.height);
+  towers.splice(towerIndex, 1);
+  userGold += sellPrice;
+  removeUI();
+
+  towers.forEach((tower) => {
+    tower.draw(ctx);
+  });
+};
+
+/*---------------------------------------------
+    [변경 끝]
+---------------------------------------------*/
 
 function placeBase() {
   const lastPoint = monsterPath[monsterPath.length - 1];
@@ -147,37 +197,28 @@ function initGame() {
   //placeInitialTowers(); // 설정된 초기 타워 개수만큼 사전에 타워 배치
   placeBase(); // 기지 배치
 
-  gameLoop(); // 게임 루프 최초 실행
-  isInitGame = true;
-}
-
 /*---------------------------------------------
     [변경 시작]
 ---------------------------------------------*/
-// export function updateCurrentStage() {
-//   monsterLevel = currentStage.id;
-//   remainMonsters = currentStage.monster;
-//   stageMonsters = currentStage.monster;
-//   monsterSpawnInterval = currentStage.monsterSpawnInterval;
+  canvas.addEventListener('click', function (event) {
+    const mouseX = event.clientX - canvas.offsetLeft;
+    const mouseY = event.clientY - canvas.offsetTop;
 
-//   // 현재 스테이지 인덱스로 다음 스테이지 인덱스 할당
-//   const currentStageIndex = stages.findIndex((stage) => stage.id === currentStage.id);
-//   const nextStageIndex = currentStageIndex + 1;
+    // 타워 리스트에서 클릭된 타워를 찾음
+    const clickedTower = towers.find((tower) => tower.isClicked(mouseX, mouseY));
 
-//   // 다음 스테이지 존재 시
-//   if (nextStageIndex < stages.length) {
-//     nextStage = stages[nextStageIndex];
-
-//     stageCleared = false;
-//   } else {
-//     // 마지막 스테이지일 경우
-//     console.log('더 이상 다음 스테이지가 없습니다.');
-//   }
-// }
+    if (clickedTower) {
+      // 타워 클릭 처리
+      clickTower(clickedTower);
+    }
+  });
 
 /*---------------------------------------------
     [변경 끝]
 ---------------------------------------------*/
+  gameLoop(); // 게임 루프 최초 실행
+  isInitGame = true;
+}
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
@@ -206,7 +247,7 @@ Promise.all([
   }
 });
 // 버튼 만드는 함수
-function createTowerButton(buttonName, onClickCallBack, positionTop, positionRight) {
+function createTowerButton(buttonName, towerNumber, positionTop, positionRight) {
   const button = document.createElement('button');
   button.textContent = buttonName;
   button.style.position = 'absolute';
@@ -215,7 +256,15 @@ function createTowerButton(buttonName, onClickCallBack, positionTop, positionRig
   button.style.padding = '10px 20px';
   button.style.fontSize = '16px';
   button.style.cursor = 'pointer';
+
   button.addEventListener('click', onClickCallBack);
+/*---------------------------------------------
+    [변경 시작]
+---------------------------------------------*/
+  button.addEventListener('click', () => requestBuyTower(towerNumber));
+/*---------------------------------------------
+    [변경 끝]
+---------------------------------------------*/
   document.body.appendChild(button);
 }
 createTowerButton('하르방\n$1000', ()=>towerManager.requestBuyTower(0), '10px', '10px');
@@ -223,3 +272,78 @@ createTowerButton('쿨하르방\n$1500', ()=>towerManager.requestBuyTower(1), '6
 //createTowerButton('강하르방\n$1500', ()=>towerManager.requestBuyTower(2), '110px', '10px'); // 광역공격 미구현
 createTowerButton('핫하르방\n$2000', ()=>towerManager.requestBuyTower(3), '160px', '10px');
 
+/*---------------------------------------------
+    [변경 시작]
+---------------------------------------------*/
+function clickTower(tower) {
+  removeUI();
+
+  createUpgradeButton(tower);
+  createSellButton(tower);
+
+  showTowerInfo(tower);
+}
+
+function createUpgradeButton(tower) {
+  const upgradeButton = document.createElement('button');
+  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost}`;
+  upgradeButton.style.position = 'absolute';
+  upgradeButton.style.left = `${tower.x + 320}px`; // 타워 좌표 기준으로 위치 설정
+  upgradeButton.style.top = `${tower.y}px`;
+  upgradeButton.style.padding = '10px';
+  upgradeButton.style.fontSize = '12px';
+
+  upgradeButton.addEventListener('click', () => requestUpgradeTower(tower.id));
+
+  document.body.appendChild(upgradeButton);
+}
+
+function createSellButton(tower) {
+  const sellButton = document.createElement('button');
+  sellButton.textContent = `판매\n$${(tower.cost + tower.upgrade * tower.upgradeCost) / 2}`;
+  sellButton.style.position = 'absolute';
+  sellButton.style.left = `${tower.x + 320}px`; // 타워 좌표 기준으로 위치 설정
+  sellButton.style.top = `${tower.y + 40}px`;
+  sellButton.style.padding = '10px';
+  sellButton.style.fontSize = '12px';
+
+  // 판매 버튼 클릭 이벤트
+  sellButton.addEventListener('click', () => requestSellTower(tower.id));
+
+  document.body.appendChild(sellButton);
+}
+
+function showTowerInfo(tower) {
+  const infoDiv = document.createElement('div');
+  infoDiv.id = 'towerInfo';
+  infoDiv.style.position = 'absolute';
+  infoDiv.style.left = `${tower.x + 320}px`;
+  infoDiv.style.top = `${tower.y - 40}px`;
+  infoDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+  infoDiv.style.color = 'white';
+  infoDiv.style.padding = '10px';
+  infoDiv.style.borderRadius = '5px';
+
+  infoDiv.innerHTML = `
+        Level: ${tower.upgrade}, Atk: ${tower.attackPower}<br>
+    `;
+
+  document.body.appendChild(infoDiv);
+}
+
+function removeUI() {
+  const buttons = document.querySelectorAll('button');
+  buttons.forEach((button) => {
+    if (button.textContent.includes('업그레이드') || button.textContent.includes('판매')) {
+      button.remove();
+    }
+  });
+
+  const infoDiv = document.getElementById('towerInfo');
+  if (infoDiv) {
+    infoDiv.remove();
+  }
+}
+/*---------------------------------------------
+    [변경 끝]
+---------------------------------------------*/

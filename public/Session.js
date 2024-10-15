@@ -4,7 +4,6 @@ import { handlerEvent } from './handlers/helper.js';
 import { assetManager } from './src/init/AssetManager.js';
 import { utils } from './utils/utils.js';
 
-
 /*---------------------------------------------
     [Session 생성자]
 
@@ -33,6 +32,18 @@ class Session {
     // 이벤트 결과
     this.socket.on('response', (data) => {
       console.log('Server response:', data);
+
+      if (data.tower !== undefined) {
+        placeNewTower(data.tower);
+      }
+
+      if (data.towerId !== undefined) {
+        upgradeTower(data.towerId);
+      }
+
+      if (data.sellPrice !== undefined) {
+        sellTower(data.towerId, data.sellPrice);
+      }
     });
 
     // 클라이언트가 서버와 연결될 때
