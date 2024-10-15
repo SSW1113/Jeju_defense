@@ -78,16 +78,17 @@ class TowerManager {
         return false;
       }
   }
-  async removeTower(uuid, towerId) {
+
+  async removeTower(uuid, towerUuid) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
       const userData = JSON.parse(userDataJSON);
-      const towerIndex = userData.towers.findIndex((e) => e.towerId === towerId);
+      const towerIndex = userData.towers.findIndex((e) => e.uuid === towerUuid);
 
       userData.towers.splice(towerIndex, 1);
 
       await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
-      console.log(`${towerId}타워 데이터 삭제`);
+      console.log(`${towerUuid}타워 데이터 삭제`);
 
       return true;
     } catch (error) {

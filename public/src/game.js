@@ -1,3 +1,4 @@
+import { REFUND_PERCENT } from '../constants.js';
 import { ePacketId } from '../Packet.js';
 import { session } from '../Session.js';
 import { utils } from '../utils/utils.js';
@@ -159,6 +160,9 @@ function initGame() {
       // 타워 클릭 처리
       clickTower(clickedTower);
     }
+    else{
+      removeUI();
+    }
   });
 
   gameLoop(); // 게임 루프 최초 실행
@@ -233,21 +237,6 @@ function createTowerButton(buttonName, onClickCallBack, positionTop, positionRig
   document.body.appendChild(button);
 }
 
-//타워 업그레이드 요청
-function createUpgradeButton(tower) {
-  const upgradeButton = document.createElement('button');
-  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost}`;
-  upgradeButton.style.position = 'absolute';
-  upgradeButton.style.left = `${tower.x + 320}px`; // 타워 좌표 기준으로 위치 설정
-  upgradeButton.style.top = `${tower.y}px`;
-  upgradeButton.style.padding = '10px';
-  upgradeButton.style.fontSize = '12px';
-
-  upgradeButton.addEventListener('click', () => towerManager.requestUpgradeTower(tower.id, tower.uuid));
-
-  document.body.appendChild(upgradeButton);
-}
-
 function clickTower(tower) {
   removeUI();
 
@@ -257,38 +246,64 @@ function clickTower(tower) {
   showTowerInfo(tower);
 }
 
-
-function createSellButton(tower) {
-  const sellButton = document.createElement('button');
-  sellButton.textContent = `판매\n$${(tower.cost + tower.upgrade * tower.upgradeCost) / 2}`;
-  sellButton.style.position = 'absolute';
-  sellButton.style.left = `${tower.x + 320}px`; // 타워 좌표 기준으로 위치 설정
-  sellButton.style.top = `${tower.y + 40}px`;
-  sellButton.style.padding = '10px';
-  sellButton.style.fontSize = '12px';
-
-  // 판매 버튼 클릭 이벤트
-  sellButton.addEventListener('click', () => requestSellTower(tower.id));
-
-  document.body.appendChild(sellButton);
-}
-
 function showTowerInfo(tower) {
   const infoDiv = document.createElement('div');
   infoDiv.id = 'towerInfo';
   infoDiv.style.position = 'absolute';
-  infoDiv.style.left = `${tower.x + 320}px`;
-  infoDiv.style.top = `${tower.y - 40}px`;
+  infoDiv.style.left = `${tower.x }px`;
+  infoDiv.style.top = `${tower.y + 200}px`;
   infoDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
   infoDiv.style.color = 'white';
   infoDiv.style.padding = '10px';
   infoDiv.style.borderRadius = '5px';
 
   infoDiv.innerHTML = `
-        Level: ${tower.upgrade}, Atk: ${tower.attackPower}<br>
+        Level: ${tower.upgrade}, Atk: ${tower.attackPower+(tower.upgrade*20)}<br>
     `;
 
   document.body.appendChild(infoDiv);
+}
+
+//타워 업그레이드 요청
+function createUpgradeButton(tower) {
+  const upgradeButton = document.createElement('button');
+  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost+(tower.upgrade * tower.upgradeCostInc)}`;
+  upgradeButton.style.position = 'absolute';
+  upgradeButton.style.left = `${tower.x }px`; // 타워 좌표 기준으로 위치 설정
+  upgradeButton.style.top = `${tower.y+ 240}px`;
+  upgradeButton.style.padding = '10px';
+  upgradeButton.style.fontSize = '12px';
+
+  upgradeButton.addEventListener('click', () => {
+    //타워 업그레이드 요청
+    towerManager.requestUpgradeTower(tower.id, tower.uuid)
+
+    //UI닫기
+    removeUI();
+  });
+
+  document.body.appendChild(upgradeButton);
+}
+
+function createSellButton(tower) {
+  const sellButton = document.createElement('button');
+  sellButton.textContent = `판매\n$${(tower.cost + tower.upgradeCost+ (tower.upgrade * tower.upgradeCostInc)) * REFUND_PERCENT}`;
+  sellButton.style.position = 'absolute';
+  sellButton.style.left = `${tower.x}px`; // 타워 좌표 기준으로 위치 설정
+  sellButton.style.top = `${tower.y + 280}px`;
+  sellButton.style.padding = '10px';
+  sellButton.style.fontSize = '12px';
+
+  // 판매 버튼 클릭 이벤트
+  sellButton.addEventListener('click', () => {
+    //타워 환불 요청
+    towerManager.requestSellTower(tower.id, tower.uuid)
+
+    //UI 닫기
+    removeUI();
+  });
+
+  document.body.appendChild(sellButton);
 }
 
 function removeUI() {

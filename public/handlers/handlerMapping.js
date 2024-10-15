@@ -1,9 +1,9 @@
-import { S2CBuyTower } from "./S2CBuyTower.handler.js";
 import { S2CInitTower } from "./S2CInitTower.handler.js";
 import { S2CMonsterKill } from "./S2CMonsterKill.handler.js";
 import { S2CStageMove } from "./S2CStageMove.handler.js";
 import { S2CStartGame } from "./S2CStartGame.handler.js";
-import { S2CUpgradeTower } from "./S2CUpgrade.handler.js";
+import { S2CBuyTower, S2CSellTower, S2CUpgradeTower } from "./S2CTower.handler.js";
+
 import { genMonster } from "./genMonster.handler.js";
   /*---------------------------------------------
     [사용자 정의 이벤트 콜백 함수]
@@ -13,6 +13,7 @@ const handlerMappings = {
   3 : genMonster,
   40: S2CMonsterKill,
   41: S2CBuyTower,
+  42: S2CSellTower,
   43: S2CUpgradeTower,
   44: S2CStartGame,
   45: S2CInitTower,

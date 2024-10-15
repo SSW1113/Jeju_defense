@@ -58,7 +58,7 @@ export class Tower {
   attack(monster) {
     // 타워가 타워 사정거리 내에 있는 몬스터를 공격하는 메소드이며 사정거리에 닿는지 여부는 game.js에서 확인합니다.
     if (this.currentCooldown <= 0) {
-      monster.hp -= this.attackPower + this.upgrade * 10;
+      monster.hp -= this.attackPower + this.upgrade * 20;
       this.speacialEffect(monster);
 
       this.currentCooldown = this.cooldown; // 3초 쿨타임 (초당 60프레임)

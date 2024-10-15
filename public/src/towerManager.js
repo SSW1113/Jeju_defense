@@ -72,19 +72,52 @@ class TowerManager{
         }
     }
 
+    
+    removeTower(towerUuid) {
+      try {
+        //인덱스 찾기
+          const index = this.towers.findIndex((tower) => tower.uuid === towerUuid);
+          if (index === -1) {
+              console.log(`타워 찾기 실패: ${towerUuid}`);
+              return false;
+          }
+          //타워 제거
+          this.towers.splice(index, 1);
+          console.log(`타워 제거: ${towerUuid}`);
+          return true;
+      } catch (error) {
+          console.log(`타워 제거 중 오류 발생:`, error);
+          return false;
+      }
+  }
+  
+/*---------------------------------------------
+  [타워 구입]
+---------------------------------------------*/
     requestBuyTower(towerId){
         console.log("requestBuyTower")
         const position = utils.getRandomPositionNearPath(200);
 
-        console.log(position, "si");
         session.sendEvent(ePacketId.BuyTower, {towerId, position});
     }
-
+/*---------------------------------------------
+  [타워 업그레이드]
+---------------------------------------------*/
     requestUpgradeTower(towerId, towerUuid){
       console.log('requestUpgradeTower');
       console.log('towerId: ', towerId);
       
       session.sendEvent(ePacketId.UpgradeTower, {towerUuid, towerId});
+    }
+
+/*---------------------------------------------
+  [타워 환불]
+---------------------------------------------*/
+    requestSellTower(towerId, towerUuid) {
+      console.log('requestSellTower');
+      console.log('towerId: ', towerId);
+
+      session.sendEvent(ePacketId.SellTower, {towerUuid, towerId});
     }
 }
 

@@ -1,6 +1,6 @@
 import { ePacketId } from '../utils/packet.js';
 import { redis } from '../utils/redis/index.js';
-
+import { v4 as uuidv4 } from 'uuid';
 /*---------------------------------------------
     [초기 타워 생성]
 
@@ -14,12 +14,11 @@ export const initTower = async (uuid, payload) => {
   const userDataJSON = await redis.get(`user:${uuid}:data`);
   const userData = JSON.parse(userDataJSON)
 
-  if (!userData.towers) {
-    userData.towers = [];
-  }
+  console.log("userData", userData);
   
   // 새 타워 추가
-  userData.towers.push({ towerId, position });
+  const towerUuid = uuidv4();
+  userData.towers.push({position, towerId, towerUuid, upgrade: 0});
 
   // 업데이트된 유저 데이터를 Redis에 저장
   await redis.set(`user:${uuid}:data`, JSON.stringify(userData));

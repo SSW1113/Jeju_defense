@@ -1,3 +1,4 @@
+import { REFUND_PERCENT } from '../constants.js';
 import { serverAssetManager } from '../init/assets.js';
 import { serverTowerManager } from '../models/tower.model.js';
 import { ePacketId } from '../utils/packet.js';
@@ -112,18 +113,46 @@ export const upgradeTowerHandler = async (uuid, payload) => {
     [타워 판매]
 ---------------------------------------------*/
 export const sellTowerHandler = async (uuid, payload) => {
-  const { towerId, sellPrice } = payload;
-
-  const tower = await serverTowerManager.getTower(uuid, towerId);
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  console.log("페이로드 타워판매")
+  console.log(payload)
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  const tower = await serverTowerManager.getTower(uuid, payload.towerUuid);
   if (!tower) {
     return { status: 'fail', message: '타워를 찾을 수 없습니다.' };
   }
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  console.log("타워 판매");
+  console.log(payload);
+  console.log(tower);
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
 
-  const success = await serverTowerManager.removeTower(uuid, towerId);
+  const success = await serverTowerManager.removeTower(uuid, payload.towerUuid);
 
   if (!success) {
     return { status: 'fail', message: '타워 판매 실패' };
   }
 
-  return { status: 'success', towerId: towerId, sellPrice: sellPrice };
+  //기본 타워 설치 비용 계산
+  let totalCost = serverAssetManager.getTowerCost(payload.towerId);
+
+  //기본 업그레이드 비용 계산
+  const upgradeCost = serverAssetManager.getUpgradeTowerUpgradeCost(payload.towerId); 
+
+  //업그레이드 추가 비용 계산
+  const upgradeCostInc = serverAssetManager.getUpgradeTowerUpgradeCostInc(payload.towerId); 
+  for (let i = 0; i < tower.upgrade; i+=1) {
+    totalCost +=  upgradeCost + (i * upgradeCostInc);
+  }
+
+  
+  //지금은 0.6
+  const resellGold = totalCost * REFUND_PERCENT;
+
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  console.log("비용")
+  console.log(totalCost, resellGold)
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+
+  return { status: 'success',  packetId: ePacketId.S2CSellTower, payload:  {towerUuid: payload.towerUuid, gold: resellGold }};
 };

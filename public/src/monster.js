@@ -1,5 +1,5 @@
 import { ePacketId } from "../Packet.js";
-import { session } from "./game.js";
+import { session } from "../Session.js";
 
 export class Monster {
     /*---------------------------------------------
