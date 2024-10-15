@@ -4,15 +4,15 @@ export class BossMonster extends Monster {
   constructor(path, monsterImages, level) {
     super(path, monsterImages, level);
 
-    this.width = 100; // 몬스터 이미지 가로 길이
-    this.height = 100; // 몬스터 이미지 세로 길이
+    this.width = 160; // 몬스터 이미지 가로 길이
+    this.height = 160; // 몬스터 이미지 세로 길이
   }
 
   draw(ctx) {
-    //const adjustedX = this.x - this.width / 2;
-    //const adjustedY = this.y - this.height / 2;
+    const adjustedX = this.x - this.width / 2;
+    const adjustedY = this.y - this.height / 2;
 
-    ctx.drawImage(this.image, this.x, this.y, this.width, this.height);
+    ctx.drawImage(this.image, adjustedX, adjustedY, this.width, this.height);
 
     ctx.font = 'bold 14px Arial';
     ctx.fillStyle = 'red';

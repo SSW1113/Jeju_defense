@@ -2,7 +2,7 @@ import { Session } from '../Session.js';
 import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { HiddenMonster } from './hiddenMonster.js';
-import { BossMonster } from './BossMonster.js';
+import { BossMonster } from './bossMonster.js';
 import { Tower } from './tower.js';
 import { ePacketId } from '../Packet.js';
 import { getGameAssets } from '../Assets.js';
