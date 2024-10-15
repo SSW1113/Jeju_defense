@@ -247,7 +247,7 @@ Promise.all([
   }
 });
 // 버튼 만드는 함수
-function createTowerButton(buttonName, towerNumber, positionTop, positionRight) {
+function createTowerButton(buttonName, onClickCallBack, positionTop, positionRight) {
   const button = document.createElement('button');
   button.textContent = buttonName;
   button.style.position = 'absolute';
@@ -256,15 +256,7 @@ function createTowerButton(buttonName, towerNumber, positionTop, positionRight) 
   button.style.padding = '10px 20px';
   button.style.fontSize = '16px';
   button.style.cursor = 'pointer';
-
   button.addEventListener('click', onClickCallBack);
-/*---------------------------------------------
-    [변경 시작]
----------------------------------------------*/
-  button.addEventListener('click', () => requestBuyTower(towerNumber));
-/*---------------------------------------------
-    [변경 끝]
----------------------------------------------*/
   document.body.appendChild(button);
 }
 createTowerButton('하르방\n$1000', ()=>towerManager.requestBuyTower(0), '10px', '10px');
