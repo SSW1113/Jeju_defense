@@ -1,9 +1,8 @@
 import { redis } from '../utils/redis/index.js';
 
-
 class TowerManager {
   constructor() {
-  
+    
   }
 
   async addTower(uuid, towerData) {
@@ -25,13 +24,17 @@ class TowerManager {
     }
   }
 
-  async getTower(uuid, towerId) {
+  async getTower(uuid, towerUuid) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
       const userData = JSON.parse(userDataJSON);
 
-      const towerIndex = userData.towers.findIndex((e) => e.towerId === towerId);
+      const towerIndex = userData.towers.findIndex((e) => e.towerUuid === towerUuid);
 
+      console.log("------------------------------------------")
+      console.log(userData)
+      console.log(towerUuid)
+      console.log("------------------------------------------")
       return userData.towers[towerIndex];
     } catch (error) {
       console.log(`Redis: 데이터 가져오기 오류: `, error);
@@ -57,6 +60,24 @@ class TowerManager {
     }
   }
 
+  async upgradeTower(uuid, towerUuid){
+    try {
+        const userDataJSON = await redis.get(`user:${uuid}:data`);
+        const userData = JSON.parse(userDataJSON);
+        const towerIndex = userData.towers.findIndex((e) => e.towerUuid === towerUuid);
+
+        userData.towers[towerIndex].upgrade += 1;
+  
+        await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
+        console.log(`Redis: 타워 ${towerUuid}의 데이터 업그레이드 완료`);
+  
+        return true;
+      } catch (error) {
+        console.log(`Redis: 타워 업그레이드 오류: `, error);
+  
+        return false;
+      }
+  }
   async removeTower(uuid, towerId) {
     try {
       const userDataJSON = await redis.get(`user:${uuid}:data`);
@@ -77,4 +98,4 @@ class TowerManager {
   }
 }
 
-export const towerManager = new TowerManager();
+export const serverTowerManager = new TowerManager();

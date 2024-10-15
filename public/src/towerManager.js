@@ -13,18 +13,18 @@ const NUM_OF_TOWERS = 4;
         -장점: 유연성과 확장성 향상
 ---------------------------------------------*/
 export class TowerFactory {
-    static createTower(towerId, position, towerImage) {
+    static createTower(towerId, position, towerImage, towerUuid) {
       const newTower = assetManager.getTowerStatOrNull(towerId);
 
       switch (towerId) {
         case 0:
-          return new NormalTower(newTower, position, towerImage);  // 기본 타워 생성
+          return new NormalTower(newTower, position, towerImage, towerUuid);  // 기본 타워 생성
         case 1:
-          return new CoolTower(newTower, position, towerImage);  // 쿨하르방 생성
+          return new CoolTower(newTower, position, towerImage, towerUuid);  // 쿨하르방 생성
         case 2:
-          return new StrongTower(newTower, position, towerImage);  // 강하르방 생성
+          return new StrongTower(newTower, position, towerImage, towerUuid);  // 강하르방 생성
         case 3:
-          return new HotTower(newTower, position, towerImage);  // 핫하르방 생성
+          return new HotTower(newTower, position, towerImage, towerUuid);  // 핫하르방 생성
         default:
           return null;
       }
@@ -52,9 +52,19 @@ class TowerManager{
         }
     }
 
-    spawnTower(towerId, position){
+    getTower(towerUuid){
+      for(let tower of this.towers){
+        if(tower.uuid == towerUuid){
+          console.log("ㅇㅇ");
+          return tower;
+        }
+      }
+      console.log(this.towers);
+    }
+
+    spawnTower(towerId, position, towerUuid){
         try {
-            let newTower = TowerFactory.createTower(towerId, position, this.towerImages[towerId]);
+            let newTower = TowerFactory.createTower(towerId, position, this.towerImages[towerId], towerUuid);
             this.towers.push(newTower);
         
         } catch (error) {
@@ -68,6 +78,13 @@ class TowerManager{
 
         console.log(position, "si");
         session.sendEvent(ePacketId.BuyTower, {towerId, position});
+    }
+
+    requestUpgradeTower(towerId, towerUuid){
+      console.log('requestUpgradeTower');
+      console.log('towerId: ', towerId);
+      
+      session.sendEvent(ePacketId.UpgradeTower, {towerUuid, towerId});
     }
 }
 

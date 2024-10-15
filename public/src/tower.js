@@ -1,10 +1,12 @@
 export class Tower {
-  constructor(towerInfo, position, towerImage) {
+  constructor(towerInfo, position, towerImage, towerUuid) {
     
   /*---------------------------------------------
         [멤버 변수]
   ---------------------------------------------*/
     //능력치
+    this.id = towerInfo.id;
+    this.uuid = towerUuid;
     this.attackPower = towerInfo.attackPower; // 타워 공격력
     this.range = towerInfo.range; // 타워 사거리
     this.currentCooldown = 0; //현재 쿨타임
@@ -69,13 +71,8 @@ export class Tower {
   [타워 업그레이드]
 ---------------------------------------------*/
   upgradeTower() {
-    /* 
-      돈 충분한지 검증해야함
-      const currentUpgradeCost = this.upgradeCost + (this.upgradeCostInc * this.upgrade)
-      if (money >= curentUpgradeCost){
+    console.log("타워 업그레이드");
 
-      }
-    */
     this.upgrade++;
   }
 
@@ -93,6 +90,7 @@ export class Tower {
   [변경 시작]
 ---------------------------------------------*/
   isClicked(mouseX, mouseY) {
+    console.log("isClicked");
     return (
       mouseX >= this.x &&
       mouseX <= this.x + this.width &&
@@ -115,14 +113,14 @@ export class Tower {
 }
 
 export class NormalTower extends Tower{
-  constructor(towerInfo, position, towerImage){
-    super(towerInfo, position, towerImage);
+  constructor(towerInfo, position, towerImage, towerUuid){
+    super(towerInfo, position, towerImage, towerUuid);
   }
 }
 // 슬로우 공격을 하는 타워 (쿨하르방)
 export class CoolTower extends Tower {
-  constructor(towerInfo, position, towerImage) {
-    super(towerInfo, position, towerImage);
+  constructor(towerInfo, position, towerImage, towerUuid) {
+    super(towerInfo, position, towerImage, towerUuid);
 
     this.slowEffect = 0.5; // 50% 슬로우
     this.slowDuration = 180;
@@ -140,8 +138,8 @@ export class CoolTower extends Tower {
 
 // 느린 광역 공격을 하는 타워 (강하르방)
 export class StrongTower extends Tower {
-  constructor(towerInfo, position, towerImage) {
-    super(towerInfo, position, towerImage);
+  constructor(towerInfo, position, towerImage, towerUuid) {
+    super(towerInfo, position, towerImage, towerUuid);
     this.splashRange = 200;
   }
 
@@ -157,7 +155,7 @@ export class StrongTower extends Tower {
 
 // 공속이 빠른 타워 (핫하르방)
 export class HotTower extends Tower {
-  constructor(towerInfo, position, towerImage) {
-    super(towerInfo, position, towerImage);
+  constructor(towerInfo, position, towerImage, towerUuid) {
+    super(towerInfo, position, towerImage, towerUuid);
   }
 }

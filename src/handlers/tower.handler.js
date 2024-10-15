@@ -1,7 +1,8 @@
 import { serverAssetManager } from '../init/assets.js';
+import { serverTowerManager } from '../models/tower.model.js';
 import { ePacketId } from '../utils/packet.js';
 import { redis } from '../utils/redis/index.js';
-
+import { v4 as uuidv4 } from 'uuid';
 
 /*---------------------------------------------
     [타워 구입]
@@ -42,29 +43,41 @@ export const buyTowerHandler = async (uuid, payload) => {
       return { status: 'fail', message: '골드가 부족합니다.' };
     }
     
+    const towerUuid = uuidv4();
     
     // 4-1. 골드 차감 
     userData.gold = userGold - towerCost;
     // 4-2. payload로 받은 좌표
-    userData.towers.push(position);
+    userData.towers.push({position, towerId, towerUuid, upgrade: 0});
 
     // 4. redis에 변경사항 저장
    await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
 
   console.log(`Redis: 유저 ${uuid}의 타워 추가됨, 골드 차감됨`);
-  return { status: 'success', packetId: ePacketId.S2CBuyTower, payload: { towerId, position, gold: userData.gold } };
+
+  return { status: 'success', packetId: ePacketId.S2CBuyTower, payload: { towerId, towerUuid, position, gold: userData.gold } };
 };
+
+
+
 
 /*---------------------------------------------
     [타워 업그레이드]
 ---------------------------------------------*/
 export const upgradeTowerHandler = async (uuid, payload) => {
-  const towerId = payload;
-
-  const tower = await towerManager.getTower(uuid, towerId);
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  console.log("페이로드 ㅇㅇ")
+  console.log(payload)
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  const tower = await serverTowerManager.getTower(uuid, payload.towerUuid);
   if (!tower) {
     return { status: 'fail', message: '타워를 찾을 수 없습니다.' };
   }
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
+  console.log("타워 업그레이드");
+  console.log(payload);
+  console.log(tower);
+  console.log("------------------------------------------------------------------------------------------------------------------------------------------------");
 
   // 돈 확인
   // const userGold = await redis.get(`user:${uuid}:gold`);
@@ -72,40 +85,27 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   //   return { status: 'fail', message: '유저 골드 정보 조회 실패.' };
   // }
 
-  let upgradeCost;
-  const towerNumber = tower.towerNumber;
-  switch (towerNumber) {
-    case 0:
-      upgradeCost = 500;
-      break;
-    case 1:
-      upgradeCost = 750;
-      break;
-    case 2:
-      upgradeCost = 1000;
-      break;
-    case 3:
-      upgradeCost = 1250;
-      break;
-  }
+  
+  let upgradeCost = tower.upgrade;
+
 
   // 돈 검증
   // if (userGold < upgradeCost) {
   //   return { status: 'fail', message: '골드가 부족합니다.' };
   // }
+// {
+//   position: { x: 1475.9620252795714, y: 502.1232869340905 },
+//   towerId: 0,
+//   towerUuid: 'feaeaf8f-1737-4456-81e3-b028b2f30959',
+//   upgrade: 0
+// }
+  const success = await serverTowerManager.updateTower(uuid, payload.towerUuid);
 
-  const success = await towerManager.updateTower(uuid, towerId, {
-    towerId: towerId,
-    x: tower.x,
-    y: tower.y,
-    towerNumber: tower.towerNumber,
-    upgrade: tower.upgrade + 1,
-  });
   if (!success) {
     return { status: 'fail', message: '타워 정보 업데이트 실패' };
   }
 
-  return { status: 'success', towerId: towerId };
+  return { status: 'success',  packetId: ePacketId.S2CUpgradeTower, payload:  {towerUuid: payload.towerUuid }};
 };
 
 /*---------------------------------------------
@@ -114,12 +114,12 @@ export const upgradeTowerHandler = async (uuid, payload) => {
 export const sellTowerHandler = async (uuid, payload) => {
   const { towerId, sellPrice } = payload;
 
-  const tower = await towerManager.getTower(uuid, towerId);
+  const tower = await serverTowerManager.getTower(uuid, towerId);
   if (!tower) {
     return { status: 'fail', message: '타워를 찾을 수 없습니다.' };
   }
 
-  const success = await towerManager.removeTower(uuid, towerId);
+  const success = await serverTowerManager.removeTower(uuid, towerId);
 
   if (!success) {
     return { status: 'fail', message: '타워 판매 실패' };

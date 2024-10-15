@@ -1,4 +1,6 @@
+import { Server } from "socket.io";
 import { redis } from "../utils/redis/index.js";
+import { monsterManager } from "./monsterSpawner.model.js";
 
 class UserManager{
     constructor(){
@@ -7,8 +9,18 @@ class UserManager{
 
     async addUser(uuid){
         try {
-            await redis.set(`user:${uuid}:data`, JSON.stringify([]));
-            console.log(`Redis: 유저 ${uuid}에 대한 빈 배열 생성`);
+            const serverTime = Date.now();
+            const initialData = {
+                score: 0,  // 초기 점수
+                gold: 0,   // 초기 골드
+                stages: [],
+                towers: []
+            };
+
+            initialData.stages.push({ id: 0, score: 0, timestamp: serverTime });
+
+            await redis.set(`user:${uuid}:data`, JSON.stringify(initialData));
+            console.log(`Redis: 유저 ${uuid}에 대한 초기 데이터 생성`);
 
             return true;
         } catch (error) {
@@ -17,10 +29,6 @@ class UserManager{
             return false;
         }
     };
-    
-    // getUser(){
-    //     return this.users;
-    // }
     
     async removeUser(uuid){
         try {
