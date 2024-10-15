@@ -14,7 +14,7 @@ utils.init(canvas);
 const ctx = canvas.getContext('2d');
 
 let base; // 기지 객체
-let baseHp = 0; // 기지 체력
+let baseHp = 20; // 기지 체력
 let isInitGame = false;
 
 // 이미지 로딩 파트
@@ -100,16 +100,20 @@ function gameLoop() {
       }
     });
   });
+
   // 몬스터가 공격을 했을 수 있으므로 기지 다시 그리기
   base.draw(ctx, baseImage);
+
   for (let i = monsterManager.monsters.length - 1; i >= 0; i--) {
     const monster = monsterManager.monsters[i];
     if (monster.hp > 0) {
       const isDestroyed = monster.move(base);
+
       if (isDestroyed) {
         /* 게임 오버 */
         alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
-        location.reload();
+        //location.reload();
+        break;
       }
       monster.draw(ctx);
     } else {
@@ -125,7 +129,7 @@ function gameLoop() {
   }
 
 
-  if (scoreAndGoldManager.remainMonsters === 0) {
+  if (scoreAndGoldManager.remainMonsters === 0 && base.hp > 0) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     console.log(scoreAndGoldManager);
 
@@ -135,7 +139,8 @@ function gameLoop() {
       score: scoreAndGoldManager.score
     });
   }
-  requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
+  
+    requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
 function initGame() {

@@ -50,19 +50,3 @@ export const killMonsterHandler = async (userId, payload) => {
 
   return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainMonsters }};
 };
-
-
-/*---------------------------------------------
-    [몬스터 공격 핸들러]
----------------------------------------------*/
-export const MonsterAttackHandler = (uuid, payload) => {
-    const { monsterId, attackPower } = payload;
-
-    const checkMonster = monsters.find((monster) => (monster) => monster.id === monsterId );
-    
-    if(!checkMonster){
-        return {status: 'fail', message: 'invalid monster'}
-    }
-    
-    return { status: 'success' }
-}

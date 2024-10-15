@@ -15,6 +15,8 @@ export const ePacketId = {
   StartGame: 4,
   InitTower: 5,
   NextStage: 11,
+  BaseDamaged: 12,
+  GameEnd: 13,
   MonsterKill: 21,
   BuyTower: 31,
   SellTower: 32,
@@ -26,7 +28,7 @@ export const ePacketId = {
   S2CStartGame: 44,
   S2CInitTower: 45,
   S2CStageMove: 46,
-  BaseDamaged: 51
+  S2CBaseDamaged: 47
 };
 
 export class Packet {

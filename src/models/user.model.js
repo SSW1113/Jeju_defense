@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { redis } from "../utils/redis/index.js";
 import { monsterManager } from "./monsterSpawner.model.js";
+import { Utils } from "../utils/Utils.js";
 
 class UserManager{
     constructor(){
@@ -13,6 +14,7 @@ class UserManager{
             const initialData = {
                 score: 0,  // 초기 점수
                 gold: 0,   // 초기 골드
+                baseHp: 20,
                 stages: [],
                 towers: []
             };
@@ -49,6 +51,26 @@ class UserManager{
             return false;
         }
     }
+
+    async attackedBase(uuid, damage) {
+        try {
+          const userDataJSON = await redis.get(`user:${uuid}:data`);
+          const userData = JSON.parse(userDataJSON);
+      
+          //기지 체력 감소
+          userData.baseHp = Utils.clamp(userData.baseHp-damage, 0, userData.baseHp);
+      
+          
+          await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
+      
+          console.log('Redis: 기지 체력 갱신 완료:', userData.baseHp);
+          return userData.baseHp; // 갱신된 기지 체력 반환
+        } catch (error) {
+          console.log(`Redis: 데이터 가져오기 오류:`, error);
+          return null;
+        }
+      }
+      
 }
 
 export const userManager = new UserManager();

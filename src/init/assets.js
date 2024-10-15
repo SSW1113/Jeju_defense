@@ -83,6 +83,12 @@ class ServerAssetManager{
     getStageClearGoldOrNull(stageId){
       return this.stages.data[stageId].reward || null;;
     }
+
+    getMonsterAttackPowerOrNull(monsterId){
+      console.log(this.monsters.data);
+      console.log(monsterId);
+      return this.monsters.data[monsterId].attackPower || null;;
+    }
 }
 
 export const serverAssetManager = new ServerAssetManager();

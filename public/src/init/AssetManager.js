@@ -34,6 +34,12 @@ class AssetManager{
         console.log(this.stages, "this.stages")
         return this.stages;
     }
+
+    getMonsterAttackPowerOrNull(monsterId){
+        console.log(this.monsters);
+        console.log(monsterId);
+        return this.monsters[monsterId].attackPower || null;;
+      }
 }
 
 export const assetManager = new AssetManager();

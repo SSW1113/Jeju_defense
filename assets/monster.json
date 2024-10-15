@@ -7,7 +7,7 @@
       "maxHp": 100,
       "hp": 100,
       "attackPower": 10,
-      "speed": 1,
+      "speed": 30,
       "goldDrop": 30
     },
     {
@@ -15,7 +15,7 @@
       "maxHp": 200,
       "hp": 200,
       "attackPower": 10,
-      "speed": 1,
+      "speed": 30,
       "goldDrop": 50
     },
     {
@@ -23,7 +23,7 @@
       "maxHp": 300,
       "hp": 300,
       "attackPower": 10,
-      "speed": 1,
+      "speed": 30,
       "goldDrop": 100
     },
     {
@@ -31,7 +31,7 @@
       "maxHp": 350,
       "hp": 350,
       "attackPower": 10,
-      "speed": 2,
+      "speed": 16,
       "goldDrop": 150
     },
     {
@@ -39,7 +39,7 @@
       "maxHp": 300,
       "hp": 300,
       "attackPower": 10,
-      "speed": 3,
+      "speed": 16,
       "goldDrop": 250
     }
   ]

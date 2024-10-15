@@ -1,3 +1,8 @@
+import { ePacketId } from "../Packet.js";
+import { session } from "../Session.js";
+import { utils } from "../utils/utils.js";
+import { assetManager } from "./init/AssetManager.js";
+
 export class Base {
   constructor(x, y, maxHp) {
     // 생성자 안에서 기지의 속성을 정의한다고 생각하시면 됩니다!
@@ -27,14 +32,27 @@ export class Base {
     );
   }
 
-  takeDamage(newbaseHp) {
-    // 기지가 데미지를 입는 메소드입니다.
-    // 몬스터가 기지의 HP를 감소시키고, HP가 0 이하가 되면 게임 오버 처리를 해요!
-    console.log(newbaseHp);
-    this.hp = newbaseHp;
+  isDestroyed(){
+    return this.hp <= 0;
   }
+  
+  // 기지가 데미지를 입는 메소드입니다.
+  // 몬스터가 기지의 HP를 감소시키고, HP가 0 이하가 되면 게임 오버 처리를 해요!
+  onDamaged(monsterId){
+    if(this.hp <= 0){
+      return true;
+    }
 
-  dead(){
-    return this.hp <= 0;    // 기지의 HP가 0 이하이면 true, 아니면 false
+    const damage = assetManager.getMonsterAttackPowerOrNull(monsterId);
+    session.sendEvent(ePacketId.BaseDamaged, monsterId);
+
+    this.hp = utils.clamp(this.hp-damage, 0, this.hp);
+    if(this.hp <= 0){
+      session.sendEvent(ePacketId.GameEnd);
+      return true;
+    }
+    
+
+    return false;
   }
 }

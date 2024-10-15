@@ -1,14 +1,7 @@
 import { removeBase } from "../models/base.model.js";
 import { UserManager } from "../models/user.model.js"
 
-export const gameEnd = (uuid, payload) => {
-    const { score } = payload;
-    //HP 체크
-    const baseHp = getBaseHp();
-    if (baseHp > 0) {
-        return { status: 'fail', message: 'Base HP remains' };
-    }
-    removeBase(uuid);
+export const gameEndHandler = (uuid, payload) => {
     //점수 체크
     /*
         let FinalScore = 0;

@@ -1,6 +1,6 @@
 import { ePacketId } from "../Packet.js";
 import { session } from "../Session.js";
-
+import { Base } from "./base.js";
 export class Monster {
     /*---------------------------------------------
         [생성자]
@@ -95,6 +95,7 @@ export class Monster {
   }
 
   move(base) {
+
     this.updateSpeed(); // 슬로우 확인
 
     if (this.currentIndex < this.path.length - 1) {
@@ -113,9 +114,11 @@ export class Monster {
         this.y += (deltaY / distance) * this.speed; // 단위 벡터: deltaY / distance
       }
       return false;
-    } else {
-      session.sendEvent(ePacketId.TakeDamage)
-      const isDestroyed = base.dead(); // 기지에 도달하면 기지에 데미지를 입힙니다!
+     } 
+     else {
+      console.log("--------------------------------------------");
+      console.log(this.monsterId);
+      const isDestroyed = base.onDamaged(this.monsterId); // 기지에 도달하면 기지에 데미지를 입힙니다!
       this.hp = 0; // 몬스터는 이제 기지를 공격했으므로 자연스럽게 소멸해야 합니다.
       return isDestroyed;
     }
