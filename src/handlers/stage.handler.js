@@ -18,9 +18,6 @@ export const moveStageHandler = async (userId, payload) => {
   currentStages.sort((a, b) => a.stageId - b.stageId);
   const currentStage = currentStages[currentStages.length - 1];
 
-  
-  console.log('클라이언트: ', payload.currentStage.id);
-  console.log('서버: ', currentStage.id);
   // 클라이언트 (currentStage) vs 서버 (currentStage) 비교 로직
   if (currentStage.id !== payload.currentStage.id) {
     return { status: 'fail', message: 'Current stage mismatch' };
@@ -74,8 +71,11 @@ export const moveStageHandler = async (userId, payload) => {
   stageData.sort((a, b) => a.stageId - b.stageId);
   const currentStageData = stageData[stageData.length - 1];
 
+  // 보스 등장 초기화
+  const bossAppear = false;
+
   // 로그 체크
   console.log('Stage: ', currentStageData);
 
-  return { status: 'success', currentStage: currentStageData, currentGold: currentGold };
+  return { status: 'success', currentStage: currentStageData, currentGold: currentGold, bossAppear };
 };

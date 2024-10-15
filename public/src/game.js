@@ -2,6 +2,7 @@ import { Session } from '../Session.js';
 import { Base } from './base.js';
 import { Monster } from './monster.js';
 import { HiddenMonster } from './hiddenMonster.js';
+import { BossMonster } from './BossMonster.js';
 import { Tower } from './tower.js';
 import { ePacketId } from '../Packet.js';
 import { getGameAssets } from '../Assets.js';
@@ -30,6 +31,7 @@ const hiddenMonsters = [];
 let remainHiddenMonsters = 0;
 /////////////// 보스 몬스터 정보 /////////////////
 const bossMonsters = []; // 쌍둥이 보스 등 확장 보류
+let bossAppear = false;
 let bossKilled = false;
 /////////////////////////////////////////////////
 
@@ -70,6 +72,8 @@ let score = 0; // 게임 점수
 let remainMonsters = Infinity; // 남은 몬스터 숫자
 let stageMonsters = Infinity; // 스테이지 몬스터 숫자
 
+
+//////////////////// GET SET 모음 /////////////////////////////
 export const setCurrentStage = (newCurrentStage) => {
   currentStage = newCurrentStage;
 };
@@ -85,12 +89,21 @@ export const setRemainMonsters = (newRemainMonsters) => {
 export const setRemainHiddenMonsters = (newRemainHiddenMonsters) => {
   remainHiddenMonsters = newRemainHiddenMonsters;
 };
+export const setBossAppear = (newBossAppear) => {
+  bossAppear = newBossAppear;
+};
+export const setBossKilled = (newBossKilled) => {
+  bossKilled = newBossKilled;
+};
 
 export const getCurrentStage = () => currentStage;
 export const getUserGold = () => userGold;
 export const getScore = () => score;
 export const getRemainMonsters = () => remainMonsters;
 export const getRemainHiddenMonsters = () => remainHiddenMonsters;
+////////////////////////////////////////////////////////////////
+
+
 
 function generateRandomMonsterPath() {
   const path = [];
@@ -220,10 +233,16 @@ function spawnMonster() {
   }
 }
 
+//////////////////// 히든, 보스 몬스터 생성 //////////////////////
 function spawnHiddenMonster() {
   hiddenMonsters.push(new HiddenMonster(monsterPath, monsterImages, monsterLevel * 2));
   remainHiddenMonsters++;
 }
+
+function spawnBossMonster() {
+  bossMonsters.push(new BossMonster(monsterPath, monsterImages, monsterLevel * 3));
+}
+/////////////////////////////////////////////////////////////////
 
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
@@ -298,6 +317,9 @@ function gameLoop() {
     }
   }
 
+  /////////////////////////////////////////////////////////////////////
+  ////////////////////// 히든, 보스 몬스터 /////////////////////////////
+  /////////////////////////////////////////////////////////////////////
   for (let i = hiddenMonsters.length - 1; i >= 0; i--) {
     const hiddenMonster = hiddenMonsters[i];
     if (hiddenMonster.hp > 0) {
@@ -332,11 +354,18 @@ function gameLoop() {
       bossMonsters.splice(i, 1);
 
       // 서버로 몬스터 처치 요청 (payload: currentStage, bossKilled)
-      session.sendEvent(ePacketId.HiddenMonsterKill, { currentStage, bossKilled });
+      session.sendEvent(ePacketId.MonsterKill, { currentStage, bossKilled });
     }
   }
 
-  if (remainMonsters === 0 && remainHiddenMonsters === 0 && !stageCleared) {
+  // 스테이지 보스 등장
+  if (remainMonsters === 0 && !bossAppear) {
+    spawnBossMonster();
+    bossAppear = true;
+  }
+
+  // 일반 몬스터, 히든 몬스터, 보스 몬스터 전부 처치 시 다음 스테이지로
+  if (remainMonsters === 0 && remainHiddenMonsters === 0 && bossKilled && !stageCleared) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     session.sendEvent(ePacketId.NextStage, {
       currentStage: currentStage,
@@ -345,6 +374,7 @@ function gameLoop() {
     });
 
     stageCleared = true;
+    bossKilled = false;
   }
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함

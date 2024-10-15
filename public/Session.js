@@ -8,6 +8,8 @@ import {
   setUserGold,
   setRemainMonsters,
   setRemainHiddenMonsters,
+  setBossAppear,
+  setBossKilled,
   updateCurrentStage,
 } from './src/game.js';
 
@@ -57,6 +59,12 @@ export class Session {
       }
       if (data.remainHiddenMonsters !== undefined) {
         setRemainHiddenMonsters(data.remainHiddenMonsters);
+      }
+      if (data.bossAppear !== undefined) {
+        setBossAppear(data.bossAppear);
+      }
+      if (data.bossKilled !== undefined) {
+        setBossKilled(data.bossKilled);
       }
     });
 

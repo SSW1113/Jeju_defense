@@ -40,6 +40,9 @@ export const killMonsterHandler = async (userId, payload) => {
   if (payload.remainHiddenMonsters !== undefined) {
     goldToAdd *= 2;
     scoreToAdd *= 2;
+  } else if (payload.bossKilled !== undefined) {
+    goldToAdd *= 3;
+    scoreToAdd *= 3;
   }
 
   // 골드, 점수 증가
@@ -68,6 +71,16 @@ export const killMonsterHandler = async (userId, payload) => {
       currentGold: currentGold,
       currentScore: currentScore,
       remainHiddenMonsters,
+    };
+  }
+
+  if (payload.bossKilled !== undefined) {
+    const bossKilled = true;
+    return {
+      status: 'success',
+      currentGold: currentGold,
+      currentScore: currentScore,
+      bossKilled,
     };
   }
 };
