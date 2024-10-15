@@ -4,11 +4,9 @@ import { scoreManager } from '../models/score.model.js';
 import { serverAssetManager } from '../init/assets.js';
 import { ePacketId } from '../utils/packet.js';
 
-/**
- * 몬스터 처치 핸들러
- * @param userId
- * @param payload
- */
+/*---------------------------------------------
+    [몬스터 처치 핸들러]
+---------------------------------------------*/
 export const killMonsterHandler = async (userId, payload) => {
 
   // 유저의 현재 스테이지 배열을 가져오고, 최대 스테이지 ID를 찾기

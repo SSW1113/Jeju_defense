@@ -1,10 +1,25 @@
 /*---------------------------------------------
     [PacketID]
       1. SyncGameState: 게임상태 동기화
+      2. RecoverGameState: 상태 복구
+      3. S2CGenMonster: 서버에게 받은 monsterd로 몬스터 생성
+      4. StartGame: 게임 시작
+      5. InitTower: 최초 타워 추가
+      11. NextStage: 스테이지 클리어 
+      21. MonsterKill: 몬스터 처치
+      31. BuyTower: 타워 구입
+      32. SellTower: 타워 환불
+      33. UpgradeTower: 타워 업그레이드
+      40. S2CMonsterKill: 몬스터 처치(동기화)-점수, 골드, 남은 몬스터 수 update
+      41. S2CBuyTower: 타워 구입(동기화)-서버에게 받은 towerId로 타워 생성
+      42. S2CSellTower: 타워 환불(동기화)
+      43. S2CUpgradeTower: 타워 업그레이드(동기화)
+      44. S2CStartGame: 게임 시작(동기화)-서버에게 기본 골드, 점수, 남은 몬스터 수 update
+      45. S2CInitTower: 최초 타워 추가(동기화)-서버에게 받은 towerId로 타워 생성
+      46: S2CStageMove: 스테이지 클리어(동기화)-스테이지 클리어 보상 획득
 
     [주의사항]  
         - 대문자로 시작하기
-        - issue번호에 따라 만들기
 ---------------------------------------------*/
 export const ePacketId = {
   RecoverGameState: 2,

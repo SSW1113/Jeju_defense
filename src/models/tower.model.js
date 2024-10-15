@@ -3,7 +3,7 @@ import { redis } from '../utils/redis/index.js';
 
 class TowerManager {
   constructor() {
-    this.towers = [];
+  
   }
 
   async addTower(uuid, towerData) {

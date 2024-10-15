@@ -1,6 +1,11 @@
 import { Utils } from "../utils/Utils.js";
 
+/*---------------------------------------------
+    [ServerAssetManager]
 
+  -목적: game asset을 중앙에서 관리하기 위함
+  -장점: 유지 보수 용이
+---------------------------------------------*/
 class ServerAssetManager{
     constructor(){
         this.towers = new Array();
@@ -8,10 +13,10 @@ class ServerAssetManager{
         this.stages = new Array();
     }
 
-    /**
-     * Promise.all()을 이용하여 게임 에셋 불러오기
-     * @returns gameAssets - 게임 에셋
-     */
+
+/*---------------------------------------------
+    [게임 에셋 불러오기]
+---------------------------------------------*/
     async loadGameAssets(){
         try {
             const [towers, monsters, stages] = await Promise.all([
@@ -33,6 +38,10 @@ class ServerAssetManager{
         }
     }
 
+/*---------------------------------------------
+    [getGameAssets]
+    -클라 접속 시 전달하기 위함
+---------------------------------------------*/
     getGameAssets(){
         return {towers: this.towers, monsters: this.monsters, stages: this.stages};  
     }
@@ -41,6 +50,10 @@ class ServerAssetManager{
       return this.stages.data;
     }
 
+/*---------------------------------------------
+    [getter 주의사항]
+    - 이름 규칙: get+필요한 데이터+OrNull
+---------------------------------------------*/
     getStageOrNull(stageId){
       return this.stages.data[stageId] || null;
     }

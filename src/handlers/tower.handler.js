@@ -1,58 +1,63 @@
-import { towerManager } from '../models/tower.model.js';
-import { v4 as uuidv4 } from 'uuid';
+import { serverAssetManager } from '../init/assets.js';
+import { ePacketId } from '../utils/packet.js';
+import { redis } from '../utils/redis/index.js';
 
-// 타워 구매 핸들러
+
+/*---------------------------------------------
+    [타워 구입]
+
+    1. redis에서 유저 정보 가져오기
+    2. payload로 받은 towerId로 타워 비용 가져오기
+    3. 유저의 골드로 살 수 있는지 검증
+      3-1. 골드가 부족하면 { status: fail }반환
+    4. redis에 변경사항 저장
+      4-1. 골드 차감 
+      4-2. payload로 받은 좌표
+---------------------------------------------*/
 export const buyTowerHandler = async (uuid, payload) => {
-  const { towerNumber, x, y } = payload;
-  const towerId = uuidv4();
+  const { towerId, position } = payload;
 
-  // 돈 확인
-  // const userGold = await redis.get(`user:${uuid}:gold`);
-  // if (!userGold) {
-  //   return { status: 'fail', message: '유저 골드 정보 조회 실패.' };
-  // }
-
-  // 타워 가격
-  let towerCost;
-  switch (towerNumber) {
-    case 0:
-      towerCost = 1000;
-      break;
-    case 1:
-      towerCost = 1500;
-      break;
-    case 2:
-      towerCost = 2000;
-      break;
-    case 3:
-      towerCost = 2500;
-      break;
+  //1. redis에서 유저 정보 가져오기
+  const userDataJSON = await redis.get(`user:${uuid}:data`);
+  if(!userDataJSON){
+    return;
   }
+  const userData = JSON.parse(userDataJSON);
+  console.log("userData", userData);
 
-  // 돈 검증
-  // if (userGold < towerCost) {
-  //   return { status: 'fail', message: '골드가 부족합니다.' };
-  // }
+    
+  //2. payload로 받은 towerId로 타워 비용 가져오기
+    const towerCost = serverAssetManager.getTowerCost(towerId);
+    if (!towerCost) {
+      return { status: 'fail', message: '유효하지 않은 towerId입니다.' };
+    }
+    
+    const userGold = userData.gold;
+    console.log("towerCost: ", towerCost);
+    console.log("userGold: ", userGold);
 
-  const towerData = {
-    towerId: towerId,
-    x: x,
-    y: y,
-    towerNumber: towerNumber,
-    upgrade: 0,
-  };
+    //3. 유저의 골드로 살 수 있는지 검증
+    //3-1. 골드가 부족하면 { status: fail }반환
+    if (userGold < towerCost) {
+      return { status: 'fail', message: '골드가 부족합니다.' };
+    }
+    
+    
+    // 4-1. 골드 차감 
+    userData.gold = userGold - towerCost;
+    // 4-2. payload로 받은 좌표
+    userData.towers.push(position);
 
-  const success = await towerManager.addTower(uuid, towerData);
-  if (!success) {
-    return { status: 'fail', message: '타워 추가 실패' };
-  }
+    // 4. redis에 변경사항 저장
+   await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
 
-  const tower = await towerManager.getTower(uuid, towerId);
-
-  return { status: 'success', tower: tower };
+  console.log(`Redis: 유저 ${uuid}의 타워 추가됨, 골드 차감됨`);
+  return { status: 'success', packetId: ePacketId.S2CBuyTower, payload: { towerId, position, gold: userData.gold } };
 };
 
-// 타워 업그레이드 핸들러
+/*---------------------------------------------
+    [타워 업그레이드]
+---------------------------------------------*/
 export const upgradeTowerHandler = async (uuid, payload) => {
   const towerId = payload;
 
@@ -103,7 +108,9 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   return { status: 'success', towerId: towerId };
 };
 
-// 타워 판매 핸들러
+/*---------------------------------------------
+    [타워 판매]
+---------------------------------------------*/
 export const sellTowerHandler = async (uuid, payload) => {
   const { towerId, sellPrice } = payload;
 
