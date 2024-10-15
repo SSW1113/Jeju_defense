@@ -18,11 +18,14 @@ export class Tower {
     if (this.beamDuration > 0 && this.target) {
       ctx.beginPath();
       ctx.moveTo(this.x + this.width / 2, this.y + this.height / 2);
-      ctx.lineTo(
-        this.target.x + this.target.width / 2,
-        this.target.y + this.target.height / 2
-      );
-      ctx.strokeStyle = "skyblue";
+
+      if (this.target.width >= 160) {
+        ctx.lineTo(this.target.x + this.target.width / 4, this.target.y + this.target.height / 4);
+      } else {
+        ctx.lineTo(this.target.x + this.target.width / 2, this.target.y + this.target.height / 2);
+      }
+
+      ctx.strokeStyle = 'skyblue';
       ctx.lineWidth = 10;
       ctx.stroke();
       ctx.closePath();
