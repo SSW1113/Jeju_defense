@@ -4,7 +4,7 @@
   "data": [
     {
       "id": 0,
-      "monster": 1,
+      "monster": 5,
       "monsterSpawnInterval": 2000,
       "gold": 100,
       "score": 100,
@@ -12,7 +12,7 @@
     },
     {
       "id": 1,
-      "monster": 1,
+      "monster": 10,
       "monsterSpawnInterval": 2000,
       "gold": 150,
       "score": 200,
