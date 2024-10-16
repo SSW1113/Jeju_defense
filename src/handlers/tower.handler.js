@@ -78,17 +78,22 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   }
   const userData = JSON.parse(userDataJSON);
   const userGold = userData.gold;
-  let upgradeCost = tower.upgrade;
 
-  if (userGold < upgradeCost) {
+  let totalCost = serverAssetManager.getUpgradeTowerUpgradeCost(payload.towerId);
+  const upgradeCostInc = serverAssetManager.getUpgradeTowerUpgradeCostInc(payload.towerId);
+  for (let i = 0; i < tower.upgrade; i += 1) {
+    totalCost += (i * upgradeCostInc);
+  }
+
+  if (userGold < totalCost) {
     return { status: 'fail', message: '골드가 부족합니다.' };
   }
 
   // 돈 차감
-  userData.gold -= upgradeCost;
+  userData.gold -= totalCost;
   await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
 
-  const success = await serverTowerManager.updateTower(uuid, payload.towerUuid);
+  const success = await serverTowerManager.upgradeTower(uuid, payload.towerUuid);
   if (!success) {
     return { status: 'fail', message: '타워 정보 업데이트 실패' };
   }
@@ -96,7 +101,7 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   return {
     status: 'success',
     packetId: ePacketId.S2CUpgradeTower,
-    payload: { towerUuid: payload.towerUuid, upgradeCost },
+    payload: { towerUuid: payload.towerUuid, gold: totalCost },
   };
 };
 

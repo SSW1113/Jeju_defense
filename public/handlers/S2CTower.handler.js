@@ -28,7 +28,7 @@ export const S2CUpgradeTower = (uuid, payload) => {
   //towerManager에 타워가 존재하는지
   const tower = towerManager.getTower(payload.towerUuid);
   tower.upgradeTower();
-  scoreAndGoldManager.gold -= payload.upgradCost;
+  scoreAndGoldManager.gold -= payload.gold;
   console.log('결과는', tower); //
   console.log('페이로드는', payload); //
   return { status: 'success' };
