@@ -4,31 +4,28 @@ import { ePacketId, Packet } from '../utils/packet.js';
 class MonsterSpawner {
   constructor(session) {
     this.session = session;
-   
-    
+
     this.spawnedMonster = 0; //생성된 몬스터 수
     this.stageMonsters = null; // 생성할 총 몬스터 수
     this.spawnRate = null; //몬스터 생성 간격
     this.interval = null;
 
-    console.log("MonsterSpawner")
+    console.log('MonsterSpawner');
   }
 
   startSpawning(stageId) {
     const stageInfo = serverAssetManager.getStageOrNull(stageId);
-    console.log(stageInfo, "stageInfo", stageId);
+    console.log(stageInfo, 'stageInfo', stageId);
     this.spawnedMonster = 0; //생성된 몬스터 수
     this.stageMonsters = stageInfo.monster; // 생성할 총 몬스터 수
     this.spawnRate = stageInfo.monsterSpawnInterval; //몬스터 생성 간격
 
-
     this.interval = setInterval(() => {
-      console.log(this.spawnedMonster, this.stageMonsters)
-      if(this.spawnedMonster < this.stageMonsters){
+      console.log('monsterLog: ', this.spawnedMonster, this.stageMonsters);
+      if (this.spawnedMonster < this.stageMonsters) {
         this.createMonster(); //몬스터 생성
-        this.spawnedMonster+=1;
-      }
-      else{
+        this.spawnedMonster += 1;
+      } else {
         this.stopSpawning();
       }
     }, this.spawnRate);
@@ -37,7 +34,7 @@ class MonsterSpawner {
   createMonster() {
     const monsterId = Math.floor(Math.random() * 5);
     try {
-      this.session.sendEvent(ePacketId.S2CGenMonster, {monsterId, level: 1});
+      this.session.sendEvent(ePacketId.S2CGenMonster, { monsterId, level: 1 });
     } catch (error) {
       console.log(error);
     }
@@ -55,7 +52,7 @@ class MonsterManager {
     this.spawners = new Map();
   }
 
-   addSpanwer(session) {
+  addSpanwer(session) {
     try {
       this.spawners.set(session.uuid, new MonsterSpawner(session));
       console.log('addSpawner');
@@ -63,7 +60,6 @@ class MonsterManager {
       console.log(error);
     }
   }
-
 
   removeSpawner(uuid) {
     try {
@@ -76,11 +72,11 @@ class MonsterManager {
     }
   }
 
-  startSpawn(uuid, stageId){
-    console.log("startSpawning", stageId);
+  startSpawn(uuid, stageId) {
+    console.log('startSpawning', stageId);
     try {
       this.spawners.get(uuid).startSpawning(stageId);
-      console.log("startSpawning true");
+      console.log('startSpawning true');
       return true;
     } catch (error) {
       console.log(error);

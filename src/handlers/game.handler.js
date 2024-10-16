@@ -1,9 +1,9 @@
-import { removeBase } from "../models/base.model.js";
-import { UserManager } from "../models/user.model.js"
+import { baseManager } from '../models/base.model.js';
+import { userManager } from '../models/user.model.js';
 
 export const gameEndHandler = (uuid, payload) => {
-    //점수 체크
-    /*
+  //점수 체크
+  /*
         let FinalScore = 0;
     
         FinalScore = StageScore + SpawnScore;
@@ -12,12 +12,12 @@ export const gameEndHandler = (uuid, payload) => {
             return { status: 'fail', message: 'Score mismatch' };
         }
     */
-    //최고점수 갱신
-    const user = UserManager.getUser(uuid);
-    if (score > user.highScore) {
-        UserManager.newHighScore(uuid, score);
-        return { status: 'success', highScore: score };
-    }
+  //최고점수 갱신
+  const user = userManager.getUser(uuid);
+  if (score > user.highScore) {
+    userManager.newHighScore(uuid, score);
+    return { status: 'success', highScore: score };
+  }
 
-    return { status: 'success' };
-}
+  return { status: 'success' };
+};
