@@ -23,7 +23,7 @@ class MonsterSpawner {
     this.interval = setInterval(() => {
       console.log('monsterLog: ', this.spawnedMonster, this.stageMonsters);
       if (this.spawnedMonster < this.stageMonsters) {
-        this.createMonster(); //몬스터 생성
+        this.createMonster(stageInfo.id); //몬스터 생성
         this.spawnedMonster += 1;
       } else {
         this.stopSpawning();
@@ -31,10 +31,11 @@ class MonsterSpawner {
     }, this.spawnRate);
   }
 
-  createMonster() {
+  createMonster(level) {
     const monsterId = Math.floor(Math.random() * 5);
     try {
-      this.session.sendEvent(ePacketId.S2CGenMonster, { monsterId, level: 1 });
+      // 몬스터 소환 (임시로 stage.id로 대체)
+      this.session.sendEvent(ePacketId.S2CGenMonster, { monsterId, level: level });
     } catch (error) {
       console.log(error);
     }
