@@ -1,4 +1,9 @@
-import { REFUND_PERCENT } from '../constants.js';
+import { Session } from '../Session.js';
+import { Base } from './base.js';
+import { Monster } from './monster.js';
+import { HiddenMonster } from './hiddenMonster.js';
+import { BossMonster } from './bossMonster.js';
+import { Tower } from './tower.js';
 import { ePacketId } from '../Packet.js';
 import { session } from '../Session.js';
 import { utils } from '../utils/utils.js';
@@ -6,6 +11,7 @@ import { Base } from './base.js';
 import { monsterManager } from './monsterManager.js';
 import { scoreAndGoldManager } from './ScoreAndGoldManager.js';
 import { towerManager } from './towerManager.js';
+import { REFUND_PERCENT } from '../Constants.js';
 /*
   어딘가에 엑세스 토큰이 저장이 안되어 있다면 로그인을 유도하는 코드를 여기에 추가해주세요!
 */
@@ -15,6 +21,32 @@ const ctx = canvas.getContext('2d');
 
 let base; // 기지 객체
 let baseHp = 20; // 기지 체력
+
+
+
+/////////////// 히든 몬스터 정보 ///////////////// 변경시작
+const hiddenMonsters = [];
+
+const hiddenMonsterImages = [];
+for (let i = 1; i <= 1; i++) {
+  const img = new Image();
+  img.src = `images/gold_monster.png`;
+  hiddenMonsterImages.push(img);
+}
+/////////////// 보스 몬스터 정보 /////////////////
+const bossMonsters = []; // 쌍둥이 보스 등 확장 보류
+let bossAppear = false;
+let bossKilled = false;
+
+const bossMonsterImages = [];
+for (let i = 1; i <= NUM_OF_MONSTERS; i++) {
+  const img = new Image();
+  img.src = `images/boss_monster${i}.png`;
+  bossMonsterImages.push(img);
+}
+///////////////////////////////////////////////// 변경시작
+
+let highScore = 0; // 기존 최고 점수
 let isInitGame = false;
 
 // 이미지 로딩 파트
@@ -69,6 +101,17 @@ function placeBase() {
   base.draw(ctx, baseImage);
 }
 
+//////////////////// 히든, 보스 몬스터 생성 //////////////////////
+function spawnHiddenMonster() {
+  hiddenMonsters.push(new HiddenMonster(monsterPath, hiddenMonsterImages, scoreAndGoldManager.monsterLevel * 2));
+  scoreAndGoldManager.remainHiddenMonsters++;
+}
+
+function spawnBossMonster() {
+  bossMonsters.push(new BossMonster(monsterPath, bossMonsterImages, scoreAndGoldManager.monsterLevel * 3));
+}
+/////////////////////////////////////////////////////////////////
+
 function gameLoop() {
   // 렌더링 시에는 항상 배경 이미지부터 그려야 합니다! 그래야 다른 이미지들이 배경 이미지 위에 그려져요!
   ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height); // 배경 이미지 다시 그리기
@@ -85,12 +128,32 @@ function gameLoop() {
   ctx.fillText(`현재 레벨: ${scoreAndGoldManager.monsterLevel}`, 100, 200); // 최고 기록 표시
   ctx.fillStyle = 'red';
   ctx.fillText(`남은 몬스터: ${scoreAndGoldManager.remainMonsters}`, 100, 250); // 현재 스테이지 남은 몬스터
+  ctx.fillStyle = 'red';
+  ctx.fillText(`남은 히든 몬스터: ${scoreAndGoldManager.remainHiddenMonsters}`, 100, 300); // 현재 스테이지 남은 히든 몬스터
 
   // 타워 그리기 및 몬스터 공격 처리
   towerManager.towers.forEach((tower) => {
     tower.draw(ctx);
     tower.updateCooldown();
     monsterManager.getMonsters().forEach((monster) => {
+      const distance = Math.sqrt(
+        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
+      );
+      if (distance < tower.range) {
+        tower.attack(monster);
+      }
+    });
+
+    hiddenMonsters.forEach((monster) => {
+      const distance = Math.sqrt(
+        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
+      );
+      if (distance < tower.range) {
+        tower.attack(monster);
+      }
+    });
+
+    bossMonsters.forEach((monster) => {
       const distance = Math.sqrt(
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
       );
@@ -118,16 +181,66 @@ function gameLoop() {
     } else {
       /* 몬스터가 죽었을 때 */
 
+
       monsterManager.monsters.splice(i, 1);
       // 서버로 몬스터 처치 요청 (payload: currentStage)
       const remainMonsters = scoreAndGoldManager.remainMonsters;
       const currentStage = scoreAndGoldManager.monsterLevel;
+      // 서버로 몬스터 처치 요청 (payload: currentStage, remainMonsters)
 
       session.sendEvent(ePacketId.MonsterKill, { currentStage, remainMonsters });
     }
   }
 
-  if (scoreAndGoldManager.remainMonsters === 0 && base.hp > 0) {
+  /////////////////////////////////////////////////////////////////////
+  ////////////////////// 히든, 보스 몬스터 /////////////////////////////
+  /////////////////////////////////////////////////////////////////////
+  for (let i = hiddenMonsters.length - 1; i >= 0; i--) {
+    const hiddenMonster = hiddenMonsters[i];
+    if (hiddenMonster.hp > 0) {
+      const isDestroyed = hiddenMonster.move(base);
+      if (isDestroyed) {
+        /* 게임 오버 */
+        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        location.reload();
+      }
+      hiddenMonster.draw(ctx);
+    } else {
+      /* 몬스터가 죽었을 때 */
+      hiddenMonsters.splice(i, 1);
+
+      // 서버로 몬스터 처치 요청 (payload: currentStage, remainHiddenMonsters)
+      session.sendEvent(ePacketId.MonsterKill, { currentStage, remainHiddenMonsters: scoreAndGoldManager.remainHiddenMonsters });
+    }
+  }
+
+  for (let i = bossMonsters.length - 1; i >= 0; i--) {
+    const bossMonster = bossMonsters[i];
+    if (bossMonster.hp > 0) {
+      const isDestroyed = bossMonster.move(base);
+      if (isDestroyed) {
+        /* 게임 오버 */
+        alert('게임 오버. 스파르타 본부를 지키지 못했다...ㅠㅠ');
+        location.reload();
+      }
+      bossMonster.draw(ctx);
+    } else {
+      /* 몬스터가 죽었을 때 */
+      bossMonsters.splice(i, 1);
+
+      // 서버로 몬스터 처치 요청 (payload: currentStage, bossKilled)
+      session.sendEvent(ePacketId.MonsterKill, { currentStage, bossKilled });
+    }
+  }
+
+  // 스테이지 보스 등장
+  if (remainMonsters === 0 && !bossAppear) {
+    spawnBossMonster();
+    bossAppear = true;
+  }
+
+  // 일반 몬스터, 히든 몬스터, 보스 몬스터 전부 처치 시 다음 스테이지로
+  if (scoreAndGoldManager.remainMonsters === 0 && scoreAndGoldManager.remainHiddenMonsters === 0 && bossKilled) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     console.log(scoreAndGoldManager);
 
@@ -135,6 +248,8 @@ function gameLoop() {
       stageId: scoreAndGoldManager.monsterLevel,
       score: scoreAndGoldManager.score,
     });
+    stageCleared = true;
+    bossKilled = false;
   }
 
   requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
@@ -170,33 +285,6 @@ function initGame() {
   isInitGame = true;
 }
 
-/*---------------------------------------------
-    [변경 시작]
----------------------------------------------*/
-// export function updateCurrentStage() {
-//   monsterLevel = currentStage.id;
-//   remainMonsters = currentStage.monster;
-//   stageMonsters = currentStage.monster;
-//   monsterSpawnInterval = currentStage.monsterSpawnInterval;
-
-//   // 현재 스테이지 인덱스로 다음 스테이지 인덱스 할당
-//   const currentStageIndex = stages.findIndex((stage) => stage.id === currentStage.id);
-//   const nextStageIndex = currentStageIndex + 1;
-
-//   // 다음 스테이지 존재 시
-//   if (nextStageIndex < stages.length) {
-//     nextStage = stages[nextStageIndex];
-
-//     stageCleared = false;
-//   } else {
-//     // 마지막 스테이지일 경우
-//     console.log('더 이상 다음 스테이지가 없습니다.');
-//   }
-// }
-
-/*---------------------------------------------
-    [변경 끝]
----------------------------------------------*/
 
 // 이미지 로딩 완료 후 서버와 연결하고 게임 초기화
 Promise.all([
@@ -205,6 +293,8 @@ Promise.all([
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterManager.monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...hiddenMonsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...bossMonsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
 ]).then(async () => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   console.log('try connect');
@@ -325,3 +415,21 @@ createTowerButton('하르방\n$1000', () => towerManager.requestBuyTower(0), '10
 createTowerButton('쿨하르방\n$1500', () => towerManager.requestBuyTower(1), '60px', '10px');
 createTowerButton('강하르방\n$1500', () => towerManager.requestBuyTower(2), '110px', '10px');
 createTowerButton('핫하르방\n$2000', () => towerManager.requestBuyTower(3), '160px', '10px');
+document.body.appendChild(buyTowerButton);
+
+function spawnHiddenMonsterButton(buttonName, onClickCallBack, positionTop, positionRight) {
+  const button = document.createElement('button');
+  button.textContent = buttonName;
+  button.style.position = 'absolute';
+  button.style.top = positionTop;
+  button.style.right = positionRight;
+  button.style.padding = '10px 20px';
+  button.style.fontSize = '16px';
+  button.style.cursor = 'pointer';
+
+  button.addEventListener('click', onClickCallBack);
+
+  document.body.appendChild(button);
+}
+
+spawnHiddenMonsterButton('히든 몬스터 소환', spawnHiddenMonster, '60px', '10px');

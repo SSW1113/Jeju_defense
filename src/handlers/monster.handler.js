@@ -35,8 +35,16 @@ export const killMonsterHandler = async (userId, payload) => {
   }
 
   // 스테이지 별 점수, 골드 증가
-  const goldToAdd = currentStageData.gold;
-  const scoreToAdd = currentStageData.score;
+  let goldToAdd = currentStageData.gold;
+  let scoreToAdd = currentStageData.score;
+
+  if (payload.remainHiddenMonsters !== undefined) {
+    goldToAdd *= 2;
+    scoreToAdd *= 2;
+  } else if (payload.bossKilled !== undefined) {
+    goldToAdd *= 3;
+    scoreToAdd *= 3;
+  }
 
   // 골드, 점수 증가
   await goldManager.earnGold(userId, goldToAdd);
@@ -45,8 +53,32 @@ export const killMonsterHandler = async (userId, payload) => {
   const currentGold = await goldManager.getGold(userId);
   const currentScore = await scoreManager.getScore(userId);
 
-  // 몬스터 킬 수 증가
-  const remainMonsters = payload.remainMonsters - 1;
+  // 남은 몬스터
+  if (payload.remainMonsters !== undefined) {
+    const remainMonsters = payload.remainMonsters - 1;
+    return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainMonsters }};
+  }
 
-  return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainMonsters }};
+  // 남은 히든 몬스터
+  if (payload.remainHiddenMonsters !== undefined) {
+    const remainHiddenMonsters = payload.remainHiddenMonsters - 1;
+    return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainHiddenMonsters }};
+    // return {
+    //   status: 'success',
+    //   currentGold: currentGold,
+    //   currentScore: currentScore,
+    //   remainHiddenMonsters,
+    // };
+  }
+
+  if (payload.bossKilled !== undefined) {
+    const bossKilled = true;
+    return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, bossKilled }};
+    // return {
+    //   status: 'success',
+    //   currentGold: currentGold,
+    //   currentScore: currentScore,
+    //   bossKilled,
+    // };
+  }
 };

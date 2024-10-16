@@ -1,8 +1,12 @@
 import { ePacketId, Packet } from './Packet.js';
-import { CLIENT_VERSION } from './constants.js';
 import { handlerEvent } from './handlers/helper.js';
 import { assetManager } from './src/init/AssetManager.js';
 import { utils } from './utils/utils.js';
+
+import { CLIENT_VERSION } from './Constant.js';
+import { Packet } from './Packet.js';
+import { loadGameAssets } from './Assets.js';
+import { initStage } from './src/game.js';
 
 
 /*---------------------------------------------

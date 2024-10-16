@@ -69,11 +69,14 @@ export const moveStageHandler = async (userId, payload) => {
   stageData.sort((a, b) => a.stageId - b.stageId);
   const currentStageData = stageData[stageData.length - 1];
 
+  // 보스 등장 초기화
+  const bossAppear = false;
+
   // 로그 체크
   //console.log('Stage: ', currentStageData);
 
   //몬스터 스폰
   monsterManager.startSpawn(userId, payload.stageId+1);
 
-  return { status: 'success', packetId: ePacketId.S2CStageMove, payload: {currentStage: payload.stageId+1, gold: currentGold, remainMonsters: nextStageInfo.monster}};
+  return { status: 'success', packetId: ePacketId.S2CStageMove, payload: {currentStage: currentStageData, gold: currentGold, remainMonsters: nextStageInfo.monster, doesBossAppear: bossAppear}};
 };
