@@ -1,0 +1,86 @@
+{
+  "name": "stage",
+  "version": "1.0.0",
+  "data": [
+    {
+      "id": 0,
+      "monster": 5,
+      "monsterSpawnInterval": 2000,
+      "gold": 100,
+      "score": 100,
+      "reward": 1000
+    },
+    {
+      "id": 1,
+      "monster": 10,
+      "monsterSpawnInterval": 2000,
+      "gold": 150,
+      "score": 200,
+      "reward": 2000
+    },
+    {
+      "id": 2,
+      "monster": 1,
+      "monsterSpawnInterval": 3000,
+      "gold": 200,
+      "score": 300,
+      "reward": 3000
+    },
+    {
+      "id": 3,
+      "monster": 30,
+      "monsterSpawnInterval": 3000,
+      "gold": 250,
+      "score": 400,
+      "reward": 4000
+    },
+    {
+      "id": 4,
+      "monster": 40,
+      "monsterSpawnInterval": 3000,
+      "gold": 300,
+      "score": 500,
+      "reward": 5000
+    },
+    {
+      "id": 5,
+      "monster": 50,
+      "monsterSpawnInterval": 2500,
+      "gold": 350,
+      "score": 600,
+      "reward": 6000
+    },
+    {
+      "id": 6,
+      "monster": 60,
+      "monsterSpawnInterval": 2000,
+      "gold": 400,
+      "score": 700,
+      "reward": 7000
+    },
+    {
+      "id": 7,
+      "monster": 70,
+      "monsterSpawnInterval": 1500,
+      "gold": 450,
+      "score": 800,
+      "reward": 8000
+    },
+    {
+      "id": 8,
+      "monster": 80,
+      "monsterSpawnInterval": 1000,
+      "gold": 500,
+      "score": 900,
+      "reward": 9000
+    },
+    {
+      "id": 9,
+      "monster": 90,
+      "monsterSpawnInterval": 100,
+      "gold": 550,
+      "score": 1000,
+      "reward": 10000
+    }
+  ]
+}

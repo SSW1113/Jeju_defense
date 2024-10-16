@@ -1,0 +1,46 @@
+{
+  "name": "monster",
+  "varsion": "1.0.0",
+  "data": [
+    {
+      "id": 0,
+      "maxHp": 100,
+      "hp": 100,
+      "attackPower": 1,
+      "speed": 2,
+      "goldDrop": 100
+    },
+    {
+      "id": 1,
+      "maxHp": 100,
+      "hp": 100,
+      "attackPower": 1,
+      "speed": 2,
+      "goldDrop": 100
+    },
+    {
+      "id": 2,
+      "maxHp": 100,
+      "hp": 100,
+      "attackPower": 1,
+      "speed": 2,
+      "goldDrop": 100
+    },
+    {
+      "id": 3,
+      "maxHp": 100,
+      "hp": 100,
+      "attackPower": 1,
+      "speed": 2,
+      "goldDrop": 100
+    },
+    {
+      "id": 4,
+      "maxHp": 100,
+      "hp": 100,
+      "attackPower": 1,
+      "speed": 2,
+      "goldDrop": 100
+    }
+  ]
+}
