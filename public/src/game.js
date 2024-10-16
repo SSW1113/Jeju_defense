@@ -35,8 +35,6 @@ for (let i = 1; i <= 1; i++) {
 }
 /////////////// 보스 몬스터 정보 /////////////////
 const bossMonsters = []; // 쌍둥이 보스 등 확장 보류
-let bossAppear = false;
-let bossKilled = false;
 
 const bossMonsterImages = [];
 for (let i = 1; i <= NUM_OF_MONSTERS; i++) {

@@ -9,8 +9,11 @@ class ScoreAndGoldManager{
         this.gold = 0;
         this.score = 0;
         this.remainMonsters = 30;
+        this.remainHiddenMonsters = 30;
         this.monsterLevel = 0;
         this.highScore = 0;
+        this.doesBossAppear = false;
+        this.isBossKilled = false;
     }
 }
 

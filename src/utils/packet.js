@@ -28,7 +28,9 @@ export const ePacketId = {
   S2CStartGame: 44,
   S2CInitTower: 45,
   S2CStageMove: 46,
-  S2CBaseDamaged: 47
+  S2CBaseDamaged: 47,
+  S2CHiddenMonsterKill: 48,
+  S2CBossMonsterKill: 49
 };
 
 export class Packet {

@@ -39,9 +39,11 @@ export const killMonsterHandler = async (userId, payload) => {
   let scoreToAdd = currentStageData.score;
 
   if (payload.remainHiddenMonsters !== undefined) {
+    console.log("히든 몬스터 처치")
     goldToAdd *= 2;
     scoreToAdd *= 2;
   } else if (payload.bossKilled !== undefined) {
+    console.log("보스 몬스터 처치")
     goldToAdd *= 3;
     scoreToAdd *= 3;
   }
@@ -62,7 +64,7 @@ export const killMonsterHandler = async (userId, payload) => {
   // 남은 히든 몬스터
   if (payload.remainHiddenMonsters !== undefined) {
     const remainHiddenMonsters = payload.remainHiddenMonsters - 1;
-    return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainHiddenMonsters }};
+    return { status: 'success', packetId: ePacketId.S2CHiddenMonsterKill, payload: {gold: currentGold, score: currentScore, remainHiddenMonsters }};
     // return {
     //   status: 'success',
     //   currentGold: currentGold,
@@ -73,7 +75,7 @@ export const killMonsterHandler = async (userId, payload) => {
 
   if (payload.bossKilled !== undefined) {
     const bossKilled = true;
-    return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, bossKilled }};
+    return { status: 'success', packetId: ePacketId.S2CBossMonsterKill, payload: {gold: currentGold, score: currentScore }};
     // return {
     //   status: 'success',
     //   currentGold: currentGold,

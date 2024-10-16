@@ -19,6 +19,8 @@
       45. S2CInitTower: 최초 타워 추가(동기화)-서버에게 받은 towerId로 타워 생성
       46: S2CStageMove: 스테이지 클리어(동기화)-스테이지 클리어 보상 획득
       47. S2CBaseDamaged: 기지 피격 이벤트(동기화)
+      48. S2CHiddenMonsterKill: 히든 몬스터 처치
+      49. S2CBossMonsterKill: 보스 몬스터 처치
 
     [주의사항]  
         - 대문자로 시작하기
@@ -42,7 +44,9 @@ export const ePacketId = {
   S2CStartGame: 44,
   S2CInitTower: 45,
   S2CStageMove: 46,
-  S2CBaseDamaged: 47
+  S2CBaseDamaged: 47,
+  S2CHiddenMonsterKill: 48,
+  S2CBossMonsterKill: 49
 };
 
 export class Packet {
