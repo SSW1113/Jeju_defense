@@ -19,7 +19,6 @@ export class Tower {
     this.upgrade = 0; // 타워 업그레이드 상태
     this.cost = towerInfo.cost; // 타워 구입 비용
     this.upgradeCost = towerInfo.upgradeCost; // 기본 업그레이드 비용(500)
-    this.upgradeCostInc = towerInfo.upgradeCostInc; // 업그레이트 비용 증가량(250)
 
     //리소스
     this.image = towerImage;

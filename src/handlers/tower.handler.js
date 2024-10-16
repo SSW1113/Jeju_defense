@@ -80,10 +80,6 @@ export const upgradeTowerHandler = async (uuid, payload) => {
   const userGold = userData.gold;
 
   let totalCost = serverAssetManager.getUpgradeTowerUpgradeCost(payload.towerId);
-  const upgradeCostInc = serverAssetManager.getUpgradeTowerUpgradeCostInc(payload.towerId);
-  for (let i = 0; i < tower.upgrade; i += 1) {
-    totalCost += (i * upgradeCostInc);
-  }
 
   if (userGold < totalCost) {
     return { status: 'fail', message: '골드가 부족합니다.' };
@@ -109,31 +105,35 @@ export const upgradeTowerHandler = async (uuid, payload) => {
     [타워 판매]
 ---------------------------------------------*/
 export const sellTowerHandler = async (uuid, payload) => {
+  // 타워 정보 가져오기
   const tower = await serverTowerManager.getTower(uuid, payload.towerUuid);
   if (!tower) {
     return { status: 'fail', message: '타워를 찾을 수 없습니다.' };
   }
 
+  // 타워 삭제
   const success = await serverTowerManager.removeTower(uuid, payload.towerUuid);
-
   if (!success) {
     return { status: 'fail', message: '타워 판매 실패' };
   }
 
-  //기본 타워 설치 비용 계산
-  let totalCost = serverAssetManager.getTowerCost(payload.towerId);
+  // 비용 계산
+  let totalCost = serverAssetManager.getTowerCost(payload.towerId); // 기본 타워 판매 가격
+  totalCost += serverAssetManager.getUpgradeTowerUpgradeCost(payload.towerId) * tower.upgrade; // 업그레이드 비용 반영
+  const resellGold = totalCost * REFUND_PERCENT; // 환불 비율에 따른 판매 금액 계산
 
-  //기본 업그레이드 비용 계산
-  const upgradeCost = serverAssetManager.getUpgradeTowerUpgradeCost(payload.towerId);
-
-  //업그레이드 추가 비용 계산
-  const upgradeCostInc = serverAssetManager.getUpgradeTowerUpgradeCostInc(payload.towerId);
-  for (let i = 0; i < tower.upgrade; i += 1) {
-    totalCost += upgradeCost + i * upgradeCostInc;
+  // 사용자 데이터 가져오기 (Redis에서)
+  const userDataJSON = await redis.get(`user:${uuid}:data`);
+  if (!userDataJSON) {
+    return { status: 'fail', message: '유저 데이터를 찾을 수 없습니다.' };
   }
+  const userData = JSON.parse(userDataJSON);
 
-  //지금은 0.6
-  const resellGold = totalCost * REFUND_PERCENT;
+  // 사용자 골드 증가
+  userData.gold += resellGold;
+
+  // Redis에 갱신된 데이터 저장
+  await redis.set(`user:${uuid}:data`, JSON.stringify(userData));
 
   return {
     status: 'success',

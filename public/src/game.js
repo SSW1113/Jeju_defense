@@ -268,7 +268,7 @@ function showTowerInfo(tower) {
 //타워 업그레이드 요청
 function createUpgradeButton(tower) {
   const upgradeButton = document.createElement('button');
-  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost + tower.upgrade * tower.upgradeCostInc}`;
+  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost}`;
   upgradeButton.style.position = 'absolute';
   upgradeButton.style.left = `${tower.x + 340}px`; // 타워 좌표 기준으로 위치 설정
   upgradeButton.style.top = `${tower.y + 40}px`;
@@ -288,7 +288,7 @@ function createUpgradeButton(tower) {
 
 function createSellButton(tower) {
   const sellButton = document.createElement('button');
-  sellButton.textContent = `판매\n$${(tower.cost + tower.upgradeCost + tower.upgrade * tower.upgradeCostInc) * REFUND_PERCENT}`;
+  sellButton.textContent = `판매\n$${(tower.cost + tower.upgradeCost*tower.upgrade) * REFUND_PERCENT}`;
   sellButton.style.position = 'absolute';
   sellButton.style.left = `${tower.x + 340}px`; // 타워 좌표 기준으로 위치 설정
   sellButton.style.top = `${tower.y + 80}px`;

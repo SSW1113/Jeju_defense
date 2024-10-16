@@ -5,7 +5,6 @@
     {
       "id": 0,
       "upgradeCost": 500,
-      "upgradeCostInc": 250,
       "width": 78,
       "height": 150,
       "attackPower": 50,
@@ -17,7 +16,6 @@
     {
       "id": 1,
       "upgradeCost": 750,
-      "upgradeCostInc": 375,
       "width": 78,
       "height": 150,
       "attackPower": 50,
@@ -29,7 +27,6 @@
     {
       "id": 2,
       "upgradeCost": 750,
-      "upgradeCostInc": 375,
       "width": 78,
       "height": 150,
       "attackPower": 100,
@@ -41,7 +38,6 @@
     {
       "id": 3,
       "upgradeCost": 1000,
-      "upgradeCostInc": 500,
       "width": 78,
       "height": 150,
       "attackPower": 70,
