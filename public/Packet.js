@@ -32,6 +32,7 @@ export const ePacketId = {
   BaseDamaged: 12,
   GameEnd: 13,
   MonsterKill: 21,
+  SpawnHiddenMonster: 22,
   BuyTower: 31,
   SellTower: 32,
   UpgradeTower: 33,

@@ -50,3 +50,10 @@ export const killMonsterHandler = async (userId, payload) => {
 
   return { status: 'success', packetId: ePacketId.S2CMonsterKill, payload: {gold: currentGold, score: currentScore, remainMonsters }};
 };
+
+export const spawnHiddenMonster = async(userId, payload) => {
+  const monsterId = payload.monsterId;
+  const level = payload.level;
+
+  return { status: 'success', monsterId, level }
+}

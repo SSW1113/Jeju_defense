@@ -4,6 +4,7 @@ import { session } from '../Session.js';
 import { utils } from '../utils/utils.js';
 import { Base } from './base.js';
 import { monsterManager } from './monsterManager.js';
+import { hiddenMonsterManager } from './hiddenMonsterManager.js';
 import { scoreAndGoldManager } from './ScoreAndGoldManager.js';
 import { towerManager } from './towerManager.js';
 /*
@@ -90,7 +91,17 @@ function gameLoop() {
   towerManager.towers.forEach((tower) => {
     tower.draw(ctx);
     tower.updateCooldown();
+
     monsterManager.getMonsters().forEach((monster) => {
+      const distance = Math.sqrt(
+        Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
+      );
+      if (distance < tower.range) {
+        tower.attack(monster);
+      }
+    });
+
+    hiddenMonsterManager.getMonsters().forEach((monster) => {
       const distance = Math.sqrt(
         Math.pow(tower.x - monster.x, 2) + Math.pow(tower.y - monster.y, 2),
       );
@@ -205,6 +216,9 @@ Promise.all([
   new Promise((resolve) => (baseImage.onload = resolve)),
   new Promise((resolve) => (pathImage.onload = resolve)),
   ...monsterManager.monsterImages.map((img) => new Promise((resolve) => (img.onload = resolve))),
+  ...hiddenMonsterManager.monsterImages.map(
+    (img) => new Promise((resolve) => (img.onload = resolve)),
+  ),
 ]).then(async () => {
   /* 서버 접속 코드 (여기도 완성해주세요!) */
   console.log('try connect');
@@ -307,6 +321,21 @@ function createSellButton(tower) {
   document.body.appendChild(sellButton);
 }
 
+function spawnHiddenMonsterButton(buttonName, onClickCallBack, positionTop, positionRight) {
+  const button = document.createElement('button');
+  button.textContent = buttonName;
+  button.style.position = 'absolute';
+  button.style.top = positionTop;
+  button.style.right = positionRight;
+  button.style.padding = '10px 20px';
+  button.style.fontSize = '16px';
+  button.style.cursor = 'pointer';
+
+  button.addEventListener('click', onClickCallBack);
+
+  document.body.appendChild(button);
+}
+
 function removeUI() {
   const buttons = document.querySelectorAll('button');
   buttons.forEach((button) => {
@@ -321,7 +350,18 @@ function removeUI() {
   }
 }
 
+//////////////////// 히든, 보스 몬스터 생성 //////////////////////
+async function spawnHiddenMonster() {
+  if (session.isGameAssetsLoaded) {
+    console.log('에셋완료');
+    const monsterLevel = scoreAndGoldManager.monsterLevel;
+    hiddenMonsterManager.spawnMonster(0, monsterLevel);
+  }
+}
+
 createTowerButton('하르방\n$1000', () => towerManager.requestBuyTower(0), '10px', '10px');
 createTowerButton('쿨하르방\n$1500', () => towerManager.requestBuyTower(1), '60px', '10px');
 createTowerButton('강하르방\n$1500', () => towerManager.requestBuyTower(2), '110px', '10px');
 createTowerButton('핫하르방\n$2000', () => towerManager.requestBuyTower(3), '160px', '10px');
+
+spawnHiddenMonsterButton('히든 몬스터 소환', spawnHiddenMonster, '10px', '200px');

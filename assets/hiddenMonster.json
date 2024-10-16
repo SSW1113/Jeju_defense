@@ -1,0 +1,14 @@
+{
+  "name": "hiddenMonster",
+  "varsion": "1.0.0",
+  "data": [
+    {
+      "id": 0,
+      "maxHp": 100,
+      "hp": 100,
+      "attackPower": 1,
+      "speed": 2,
+      "goldDrop": 100
+    }
+  ]
+}

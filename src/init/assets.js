@@ -50,6 +50,10 @@ class ServerAssetManager{
       return this.stages.data;
     }
 
+    getMonsters(){
+      return this.monsters.data;
+    }
+
 /*---------------------------------------------
     [getter 주의사항]
     - 이름 규칙: get+필요한 데이터+OrNull

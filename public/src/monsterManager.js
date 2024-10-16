@@ -10,7 +10,7 @@ const NUM_OF_MONSTERS = 5; // 몬스터 개수
         -목적: 몬스터 생성 및 생성된 몬스터 관리
         -장점: 모듈화
 ---------------------------------------------*/
-class MonsterManager{
+export class MonsterManager{
     constructor(){
       this.monsters = new Array();
       this.monsterImages= new Array();
