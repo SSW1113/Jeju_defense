@@ -70,12 +70,6 @@ class ServerAssetManager{
       return this.towers.data[towerId].upgradeCost;
     }
 
-    getUpgradeTowerUpgradeCostInc(towerId){
-      console.log(towerId);
-      console.log(this.towers.data[towerId]);
-      return this.towers.data[towerId].upgradeCostInc;
-    }
-
     getStageMonsterOrNull(stageId){
       return this.stages.data[stageId].monster || null;
     }
