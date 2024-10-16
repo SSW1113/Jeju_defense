@@ -86,7 +86,6 @@ function gameLoop() {
   ctx.fillStyle = 'red';
   ctx.fillText(`남은 몬스터: ${scoreAndGoldManager.remainMonsters}`, 100, 250); // 현재 스테이지 남은 몬스터
 
-
   // 타워 그리기 및 몬스터 공격 처리
   towerManager.towers.forEach((tower) => {
     tower.draw(ctx);
@@ -121,33 +120,31 @@ function gameLoop() {
 
       monsterManager.monsters.splice(i, 1);
       // 서버로 몬스터 처치 요청 (payload: currentStage)
-      const remainMonsters= scoreAndGoldManager.remainMonsters;
+      const remainMonsters = scoreAndGoldManager.remainMonsters;
       const currentStage = scoreAndGoldManager.monsterLevel;
 
       session.sendEvent(ePacketId.MonsterKill, { currentStage, remainMonsters });
     }
   }
 
-
   if (scoreAndGoldManager.remainMonsters === 0 && base.hp > 0) {
     // 다음 스테이지 서버로 요청(payload: currentStage, nextStage, score)
     console.log(scoreAndGoldManager);
 
-    
     session.sendEvent(ePacketId.NextStage, {
       stageId: scoreAndGoldManager.monsterLevel,
-      score: scoreAndGoldManager.score
+      score: scoreAndGoldManager.score,
     });
   }
-  
-    requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
+
+  requestAnimationFrame(gameLoop); // 지속적으로 다음 프레임에 gameLoop 함수 호출할 수 있도록 함
 }
 
 function initGame() {
   if (isInitGame) {
     return;
   }
-  console.log("initGame");
+  console.log('initGame');
   monsterPath = utils.getPath(); // 몬스터 경로 생성
   initMap(); // 맵 초기화 (배경, 몬스터 경로 그리기)
 
@@ -164,8 +161,7 @@ function initGame() {
     if (clickedTower) {
       // 타워 클릭 처리
       clickTower(clickedTower);
-    }
-    else{
+    } else {
       removeUI();
     }
   });
@@ -214,7 +210,7 @@ Promise.all([
   console.log('try connect');
   session.Init('http', 'localhost', 3000);
   await session.waitForGameAssets();
-  console.log("dd");
+  console.log('dd');
 
   // serverSocket = io("http://localhost:3000", {
   //   auth: {
@@ -255,15 +251,15 @@ function showTowerInfo(tower) {
   const infoDiv = document.createElement('div');
   infoDiv.id = 'towerInfo';
   infoDiv.style.position = 'absolute';
-  infoDiv.style.left = `${tower.x }px`;
-  infoDiv.style.top = `${tower.y + 200}px`;
+  infoDiv.style.left = `${tower.x + 340}px`;
+  infoDiv.style.top = `${tower.y}px`;
   infoDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
   infoDiv.style.color = 'white';
   infoDiv.style.padding = '10px';
   infoDiv.style.borderRadius = '5px';
 
   infoDiv.innerHTML = `
-        Level: ${tower.upgrade}, Atk: ${tower.attackPower+(tower.upgrade*20)}<br>
+        Level: ${tower.upgrade}, Atk: ${tower.attackPower + tower.upgrade * 20}<br>
     `;
 
   document.body.appendChild(infoDiv);
@@ -272,16 +268,16 @@ function showTowerInfo(tower) {
 //타워 업그레이드 요청
 function createUpgradeButton(tower) {
   const upgradeButton = document.createElement('button');
-  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost+(tower.upgrade * tower.upgradeCostInc)}`;
+  upgradeButton.textContent = `업그레이드\n$${tower.upgradeCost + tower.upgrade * tower.upgradeCostInc}`;
   upgradeButton.style.position = 'absolute';
-  upgradeButton.style.left = `${tower.x }px`; // 타워 좌표 기준으로 위치 설정
-  upgradeButton.style.top = `${tower.y+ 240}px`;
+  upgradeButton.style.left = `${tower.x + 340}px`; // 타워 좌표 기준으로 위치 설정
+  upgradeButton.style.top = `${tower.y + 40}px`;
   upgradeButton.style.padding = '10px';
   upgradeButton.style.fontSize = '12px';
 
   upgradeButton.addEventListener('click', () => {
     //타워 업그레이드 요청
-    towerManager.requestUpgradeTower(tower.id, tower.uuid)
+    towerManager.requestUpgradeTower(tower.id, tower.uuid);
 
     //UI닫기
     removeUI();
@@ -292,17 +288,17 @@ function createUpgradeButton(tower) {
 
 function createSellButton(tower) {
   const sellButton = document.createElement('button');
-  sellButton.textContent = `판매\n$${(tower.cost + tower.upgradeCost+ (tower.upgrade * tower.upgradeCostInc)) * REFUND_PERCENT}`;
+  sellButton.textContent = `판매\n$${(tower.cost + tower.upgradeCost + tower.upgrade * tower.upgradeCostInc) * REFUND_PERCENT}`;
   sellButton.style.position = 'absolute';
-  sellButton.style.left = `${tower.x}px`; // 타워 좌표 기준으로 위치 설정
-  sellButton.style.top = `${tower.y + 280}px`;
+  sellButton.style.left = `${tower.x + 340}px`; // 타워 좌표 기준으로 위치 설정
+  sellButton.style.top = `${tower.y + 80}px`;
   sellButton.style.padding = '10px';
   sellButton.style.fontSize = '12px';
 
   // 판매 버튼 클릭 이벤트
   sellButton.addEventListener('click', () => {
     //타워 환불 요청
-    towerManager.requestSellTower(tower.id, tower.uuid)
+    towerManager.requestSellTower(tower.id, tower.uuid);
 
     //UI 닫기
     removeUI();
@@ -325,8 +321,7 @@ function removeUI() {
   }
 }
 
-createTowerButton('하르방\n$1000', ()=>towerManager.requestBuyTower(0), '10px', '10px');
-createTowerButton('쿨하르방\n$1500', ()=>towerManager.requestBuyTower(1), '60px', '10px');
-//createTowerButton('강하르방\n$1500', ()=>towerManager.requestBuyTower(2), '110px', '10px'); // 광역공격 미구현
-createTowerButton('핫하르방\n$2000', ()=>towerManager.requestBuyTower(3), '160px', '10px');
-
+createTowerButton('하르방\n$1000', () => towerManager.requestBuyTower(0), '10px', '10px');
+createTowerButton('쿨하르방\n$1500', () => towerManager.requestBuyTower(1), '60px', '10px');
+createTowerButton('강하르방\n$1500', () => towerManager.requestBuyTower(2), '110px', '10px');
+createTowerButton('핫하르방\n$2000', () => towerManager.requestBuyTower(3), '160px', '10px');
