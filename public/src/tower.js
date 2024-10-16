@@ -1,7 +1,6 @@
 export class Tower {
   constructor(towerInfo, position, towerImage, towerUuid) {
-    
-  /*---------------------------------------------
+    /*---------------------------------------------
         [멤버 변수]
   ---------------------------------------------*/
     //능력치
@@ -33,7 +32,7 @@ export class Tower {
     this.target = null; // 타워 광선의 목표
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
   [렌더링]
 ---------------------------------------------*/
   draw(ctx) {
@@ -50,7 +49,7 @@ export class Tower {
     }
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
   [타워 공격]
   - override하지 말것
   - speacialEffect() override하여 이벤트 처리(ex 쿨하르방의 슬로우...)
@@ -66,17 +65,17 @@ export class Tower {
       this.target = monster; // 광선의 목표 설정
     }
   }
-  
-/*---------------------------------------------
+
+  /*---------------------------------------------
   [타워 업그레이드]
 ---------------------------------------------*/
   upgradeTower() {
-    console.log("타워 업그레이드");
+    console.log('타워 업그레이드');
 
     this.upgrade++;
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
   [타워 쿨타임 계산]
 
   -공격 속도 계산 
@@ -86,11 +85,11 @@ export class Tower {
       this.currentCooldown--;
     }
   }
-/*---------------------------------------------
+  /*---------------------------------------------
   [변경 시작]
 ---------------------------------------------*/
   isClicked(mouseX, mouseY) {
-    console.log("isClicked");
+    console.log('isClicked');
     return (
       mouseX >= this.x &&
       mouseX <= this.x + this.width &&
@@ -98,22 +97,20 @@ export class Tower {
       mouseY <= this.y + this.height
     );
   }
-/*---------------------------------------------
+  /*---------------------------------------------
   [변경 끝]
 ---------------------------------------------*/
-/*---------------------------------------------
+  /*---------------------------------------------
   [특수 공격 처리]
 
   - 순수 가상함수
   - 특수 공격이 있는 타워들은 여기서 이벤트를 처리 
 ---------------------------------------------*/
-  speacialEffect(monster){
-
-  }
+  speacialEffect(monster) {}
 }
 
-export class NormalTower extends Tower{
-  constructor(towerInfo, position, towerImage, towerUuid){
+export class NormalTower extends Tower {
+  constructor(towerInfo, position, towerImage, towerUuid) {
     super(towerInfo, position, towerImage, towerUuid);
   }
 }
@@ -126,12 +123,12 @@ export class CoolTower extends Tower {
     this.slowDuration = 180;
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
   [특수 공격 처리]
 
   - 적에게 슬로우 적용
 ---------------------------------------------*/
-  speacialEffect(monster){
+  speacialEffect(monster) {
     monster.applySlow(this.slowEffect, this.slowDuration);
   }
 }
@@ -143,13 +140,13 @@ export class StrongTower extends Tower {
     this.splashRange = 200;
   }
 
-/*---------------------------------------------
+  /*---------------------------------------------
   [특수 공격 처리]
 
   - 광역 공격 
 ---------------------------------------------*/
-  speacialEffect(monster){
-    monster.applySplashDamage(this.splashRange, this.attackPower);
+  speacialEffect(monster) {
+    monster.applySplashDamage(monster, this.splashRange, this.attackPower);
   }
 }
 
