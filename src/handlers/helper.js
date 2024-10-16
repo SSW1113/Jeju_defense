@@ -12,7 +12,7 @@ export const handleConnection = async (socket, uuid) => {
   console.log(`User Connected: ${uuid} with SocketID ${socket.id}`);
 
   //1. redis에 uuid를 키 값으로 갖는 빈 배열 생성
-  userManager.addUser(uuid);
+  await userManager.addUser(uuid);
 
   //2. 클라에게 connection이벤트 발생
   socket.emit(`connection`, { uuid });
@@ -42,14 +42,15 @@ export const handleDisconnect = async (socketID, uuid) => {
 ---------------------------------------------*/
 export const handlerEvent = async (io, socket, data) => {
   //1. 클라이언트 버전이 지원되는지 확인
-  if (!CLIENT_VERSION.includes(data.clientVersion)) {
-    socket.emit('response', { status: 'fail', message: 'Client version mismatch' });
+  if (!CLIENT_VERSION.includes(data.clinetVersion)) {
+    socket.emit('responese', { status: 'fail', message: 'Client version mismatch' });
   }
 
-  console.log('data: ', data);
+  console.log(data);
 
   //2. 패킷 ID에 해당하는 핸들러 확인
   const handler = handlerMappings[data.packetId];
+
   //2-1. 핸들러가 존재하지 않을 경우 오류 처리
   if (!handler) {
     console.log('data.packetId: ', data.packetId);
@@ -59,8 +60,17 @@ export const handlerEvent = async (io, socket, data) => {
 
   //3. 핸들러를 호출하여 응답 생성
   const response = await handler(data.userId, data.payload);
-  console.log('response: ', response);
 
+  console.log(response);
   //4. 클라이언트에 결과 전송
-  socket.emit('response', response);
+  if(response.status == 'success'){
+    socket.emit('event', response); 
+  }
+
+  else if(response.status =='fail'){
+    socket.emit('response', response);
+  }
+  else{
+    console.log('response의 status값을 제대로 입력', response);
+  }
 };
